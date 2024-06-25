@@ -62,7 +62,7 @@ class TarjetaDedo
         ';
     }
 
-    private function imagen()
+    public function imagen()
     {
         return '
         <svg id="imagen_' . $this->id . '" class="huella" version="1.1" xmlns="http://www.w3.org/2000/svg"

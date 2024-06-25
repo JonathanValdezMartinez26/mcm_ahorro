@@ -1090,7 +1090,7 @@ class Ahorro extends Controller
 
         $huellasEngine = [];
         foreach ($huellas as $huella => $valor) {
-            array_push($huellasEngine, $valor["HUELLAS"]);
+            array_push($huellasEngine, $valor["HUELLA"]);
         }
 
         $datosEngine = [
@@ -1169,12 +1169,11 @@ class Ahorro extends Controller
             window.onload = () => {
                 validaHorarioOperacion("{$_SESSION['inicio']}", "{$_SESSION['fin']}")
                 if(document.querySelector("#clienteBuscado").value !== "") buscaCliente()
-                showBloqueoHuella()
             }
          
             const showBloqueoHuella = () => {
                 Swal.fire({
-                    html: `{$tarjetaDedo->mostrar()}<span id="mensajeHuella"></span><button id="modoManual" class="btn btn-primary btnHuella">Ingreso Manual</button>`,
+                    html: `<span id="mensajeHuella">Esperando autorización del cliente.</span>{$tarjetaDedo->mostrar()}`,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     allowEnterKey: false,
@@ -1197,12 +1196,9 @@ class Ahorro extends Controller
                     }
                 })
                 mano = new Mano("manoIzquierda", lector, document.querySelector(".sweet-bloqueo-mano"))
-                mano.modoValidacion()
+                mano.modoAutorizacion()
          
                 document.querySelector(".sweet-bloqueo-mano").addEventListener("validaHuella", validaHuella)
-                document.querySelector("#modoManual").addEventListener("click", () => {
-                    Swal.close()
-                })
             }
          
             const llenaDatosCliente = (datosCliente) => {

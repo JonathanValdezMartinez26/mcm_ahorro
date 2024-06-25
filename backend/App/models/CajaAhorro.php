@@ -3193,27 +3193,28 @@ sql;
     {
         $qry = <<<sql
         SELECT
+            CLIENTE,
+            HUELLA
+        FROM
             HUELLAS
-        FROM (
-            SELECT
-                CLIENTE,
-                {$datos["dedo"]}_I AS HUELLAS
-            FROM
-                HUELLAS
-            WHERE
-                {$datos["dedo"]}_I IS NOT NULL
-            UNION ALL
-            SELECT
-                CLIENTE,
-                {$datos["dedo"]}_D AS HUELLAS
-            FROM
-                HUELLAS
-            WHERE
-                {$datos["dedo"]}_D IS NOT NULL
+        UNPIVOT (
+            HUELLA FOR columna IN (
+                PULGAR_I,
+                INDICE_I,
+                MEDIO_I,
+                ANULAR_I,
+                MENIQUE_I,
+                PULGAR_D,
+                INDICE_D,
+                MEDIO_D,
+                ANULAR_D,
+                MENIQUE_D
+            )
         )
+        WHERE HUELLA IS NOT NULL
         sql;
 
-        $qry .= $datos["cliente"] ? " WHERE CLIENTE = '{$datos["cliente"]}'" : "";
+        $qry .= $datos["cliente"] ? " AND CLIENTE = '{$datos["cliente"]}'" : "";
 
         try {
             $mysqli = Database::getInstance();
