@@ -475,9 +475,6 @@ class Ahorro extends Controller
          
                 document.querySelector("#manoizquierda").addEventListener("muestraObtenida", huellasCompletas)
                 document.querySelector("#manoderecha").addEventListener("muestraObtenida", huellasCompletas)
-         
-                document.querySelector("#manoderecha").addEventListener("validaHuella", validaHuella)
-                document.querySelector("#manoizquierda").addEventListener("validaHuella", validaHuella)
             }
          
             {$this->showError}
@@ -577,6 +574,29 @@ class Ahorro extends Controller
                                 document.querySelector("#ben" + (i + 1)).style.opacity = "1"
                             }
                         })
+
+                        consultaServidor("/Ahorro/ValidaRegistroHuellas", { cliente: datosCliente.CDGCL }, (respuesta) => {
+                            if (!respuesta.success) {
+                                console.error(respuesta.error)
+                                return showError(respuesta.mensaje)
+                            }
+                             
+                            if (respuesta.datos.HUELLAS == 1) {
+                                document.querySelector("#chkRegistroHuellas").classList.remove("red")
+                                document.querySelector("#chkRegistroHuellas").classList.remove("fa-times")
+                                document.querySelector("#chkRegistroHuellas").classList.add("green")
+                                document.querySelector("#chkRegistroHuellas").classList.add("fa-check")
+                                document.querySelector("#lnkHuellas").style.cursor = "default"
+                            }
+                            
+                            if (respuesta.datos.HUELLAS == 0) {
+                                document.querySelector("#chkRegistroHuellas").classList.remove("green")
+                                document.querySelector("#chkRegistroHuellas").classList.remove("fa-check")
+                                document.querySelector("#chkRegistroHuellas").classList.add("red")
+                                document.querySelector("#chkRegistroHuellas").classList.add("fa-times")
+                                document.querySelector("#lnkHuellas").style.cursor = "pointer"
+                            }
+                        })
                     }
                      
                     const datosCL = respuesta.datos
@@ -615,6 +635,11 @@ class Ahorro extends Controller
                 document.querySelector("#chkPagoApertura").classList.remove("fa-check")
                 document.querySelector("#chkPagoApertura").classList.add("red")
                 document.querySelector("#chkPagoApertura").classList.add("fa-times")
+                document.querySelector("#chkRegistroHuellas").classList.remove("green")
+                document.querySelector("#chkRegistroHuellas").classList.remove("fa-check")
+                document.querySelector("#chkRegistroHuellas").classList.add("red")
+                document.querySelector("#chkRegistroHuellas").classList.add("fa-times")
+                document.querySelector("#lnkHuellas").style.cursor = "pointer"
                 document.querySelector("#fechaRegistro").value = ""
                 document.querySelector("#noCliente").value = ""
                 document.querySelector("#nombre").value = ""
@@ -908,7 +933,9 @@ class Ahorro extends Controller
             const mostrarModalHuellas = () => {
                 const valContrato = document.querySelector("#chkCreacionContrato").classList.contains("red")
                 const valPago = document.querySelector("#chkPagoApertura").classList.contains("red")
+                const valHuellas = document.querySelector("#chkRegistroHuellas").classList.contains("green")
 
+                if (valHuellas) return
                 if (valContrato) return showError("Debe completar el proceso de creación del contrato.")
                 if (valPago) return showError("Debe completar el proceso de pago de apertura.")
 
@@ -927,7 +954,6 @@ class Ahorro extends Controller
             }
          
             const guardarHuellas = async () => {
-         
                 if (!manoDerecha.manoLista() || !manoIzquierda.manoLista()) return showError("Debe capturar las muestras necesarias para ambas manos.")
                 
                 const manos = {}
@@ -935,7 +961,8 @@ class Ahorro extends Controller
                 Object.assign(manos, manoDerecha.getMano())
          
                 const datos = {
-                    cliente: document.querySelector("#noCliente").value || "bto",
+                    cliente: document.querySelector("#noCliente").value,
+                    ejecutivo: "{$_SESSION['usuario']}",
                     manos: JSON.stringify(manos)
                 }
          
@@ -943,35 +970,16 @@ class Ahorro extends Controller
                     if (!respuesta.success) return showError(respuesta.mensaje)
                     showSuccess(respuesta.mensaje)
                     .then(() => {
-                        manoIzquierda.modoValidacion()
-                        manoDerecha.modoValidacion()
+                        manoIzquierda.limpiarMano()
+                        manoDerecha.limpiarMano()
                         document.querySelector("#registraHuellas").disabled = true
-                    })
-                })
-            }
-         
-            const validaHuella = (e) => {
-                const datos = {
-                    cliente: document.querySelector("#noCliente").value || "bto",
-                    dedo: e.detail.dedo,
-                    muestra: e.detail.muestra
-                }
-         
-                consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
-                    e.detail.imagen.setAttribute("fill", (respuesta.success ? "green" : "red"))
-                    if (!respuesta.success) {
-                        e.detail.conteoErrores()
-                        return showError(respuesta.mensaje)
-                    }
-         
-                    e.detail.conteoErrores(0)
-                    e.detail.boton.style.display = "none"
-         
-                    showSuccess(respuesta.mensaje).then(() => {
-                        const botones = document.querySelectorAll(".btnHuella")
-                        if (Array.from(botones).every(boton => boton.style.display !== "none"))
-                            $("#modal_registra_huellas").modal("hide")
-
+                        document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente."
+                        document.querySelector("#chkRegistroHuellas").classList.remove("red")
+                        document.querySelector("#chkRegistroHuellas").classList.remove("fa-times")
+                        document.querySelector("#chkRegistroHuellas").classList.add("green")
+                        document.querySelector("#chkRegistroHuellas").classList.add("fa-check")
+                        document.querySelector("#lnkHuellas").style.cursor = "default"
+                        $("#modal_registra_huellas").modal("hide")
                     })
                 })
             }
@@ -1052,6 +1060,7 @@ class Ahorro extends Controller
 
         $datos = [
             "cliente" => $_POST['cliente'],
+            "ejecutivo" => $_POST['ejecutivo'],
             "izquierda" => $huellas['datos']['izquierda'],
             "derecha" => $huellas['datos']['derecha']
         ];
@@ -1108,6 +1117,11 @@ class Ahorro extends Controller
         $response = curl_exec($ci);
         curl_close($ci);
         return json_decode($response, true);
+    }
+
+    public function ValidaRegistroHuellas()
+    {
+        echo CajaAhorroDao::ValidaRegistroHuellas($_POST);
     }
 
     // Movimientos sobre cuentas de ahorro corriente //

@@ -3158,30 +3158,31 @@ sql;
 
     public static function RegistraHuellas($datos)
     {
-        $qry = <<<sql
-        INSERT INTO HUELLITAS
-            (CLIENTE, FECHA_REGISTRO, PULGAR_I, INDICE_I, MEDIO_I, ANULAR_I, MENIQUE_I, PULGAR_D, INDICE_D, MEDIO_D, ANULAR_D, MENIQUE_D)
-        VALUES
-            (:cliente, SYSDATE, :pulgarI, :indiceI, :medioI, :anularI, :meniqueI, :pulgarD, :indiceD, :medioD, :anularD, :meniqueD)
-        sql;
-
         $params = [
             "cliente" => $datos["cliente"],
-            "pulgarI" => $datos["izquierda"]["pulgar"],
-            "indiceI" => $datos["izquierda"]["indice"],
-            "medioI" => $datos["izquierda"]["medio"],
-            "anularI" => $datos["izquierda"]["anular"],
-            "meniqueI" => $datos["izquierda"]["menique"],
-            "pulgarD" => $datos["derecha"]["pulgar"],
-            "indiceD" => $datos["derecha"]["indice"],
-            "medioD" => $datos["derecha"]["medio"],
-            "anularD" => $datos["derecha"]["anular"],
-            "meniqueD" => $datos["derecha"]["menique"]
+            "ejecutivo" => $datos["ejecutivo"],
+            "pulgarI" => is_null($datos["izquierda"]["pulgar"]) ? "" : $datos["izquierda"]["pulgar"],
+            "indiceI" => is_null($datos["izquierda"]["indice"]) ? "" : $datos["izquierda"]["indice"],
+            "medioI" => is_null($datos["izquierda"]["medio"]) ? "" : $datos["izquierda"]["medio"],
+            "anularI" => is_null($datos["izquierda"]["anular"]) ? "" : $datos["izquierda"]["anular"],
+            "meniqueI" => is_null($datos["izquierda"]["menique"]) ? "" : $datos["izquierda"]["menique"],
+            "pulgarD" => is_null($datos["derecha"]["pulgar"]) ? "" : $datos["derecha"]["pulgar"],
+            "indiceD" => is_null($datos["derecha"]["indice"]) ? "" : $datos["derecha"]["indice"],
+            "medioD" => is_null($datos["derecha"]["medio"]) ? "" : $datos["derecha"]["medio"],
+            "anularD" => is_null($datos["derecha"]["anular"]) ? "" : $datos["derecha"]["anular"],
+            "meniqueD" => is_null($datos["derecha"]["menique"]) ? "" : $datos["derecha"]["menique"]
         ];
+
+        $qry = <<<sql
+        INSERT INTO HUELLAS
+            (CLIENTE, FECHA_REGISTRO, EJECUTIVO, PULGAR_I, INDICE_I, MEDIO_I, ANULAR_I, MENIQUE_I, PULGAR_D, INDICE_D, MEDIO_D, ANULAR_D, MENIQUE_D)
+        VALUES
+            ('{$params["cliente"]}', SYSDATE, '{$params["ejecutivo"]}', '{$params["pulgarI"]}', '{$params["indiceI"]}', '{$params["medioI"]}', '{$params["anularI"]}', '{$params["meniqueI"]}', '{$params["pulgarD"]}', '{$params["indiceD"]}', '{$params["medioD"]}', '{$params["anularD"]}', '{$params["meniqueD"]}')
+        sql;
 
         try {
             $mysqli = Database::getInstance();
-            $mysqli->insertar($qry, $params);
+            $mysqli->insertar($qry, []);
             return self::Responde(true, "Huellas registradas correctamente.");
         } catch (Exception $e) {
             return self::Responde(false, "Error al registrar huella.", null, $e->getMessage());
@@ -3198,7 +3199,7 @@ sql;
                 CLIENTE,
                 {$datos["dedo"]}_I AS HUELLAS
             FROM
-                HUELLITAS
+                HUELLAS
             WHERE
                 {$datos["dedo"]}_I IS NOT NULL
             UNION ALL
@@ -3206,7 +3207,7 @@ sql;
                 CLIENTE,
                 {$datos["dedo"]}_D AS HUELLAS
             FROM
-                HUELLITAS
+                HUELLAS
             WHERE
                 {$datos["dedo"]}_D IS NOT NULL
         )
@@ -3219,6 +3220,26 @@ sql;
             return $mysqli->queryAll($qry);
         } catch (Exception $e) {
             return [];
+        }
+    }
+
+    public static function ValidaRegistroHuellas($datos)
+    {
+        $qry = <<<sql
+        SELECT
+            COUNT(*) AS HUELLAS
+        FROM
+            HUELLAS
+        WHERE
+            CLIENTE = '{$datos["cliente"]}'
+        sql;
+
+        try {
+            $mysqli = Database::getInstance();
+            $res = $mysqli->queryOne($qry);
+            return self::Responde(true, "Consulta realizada correctamente.", $res);
+        } catch (Exception $e) {
+            return self::Responde(false, "Error al consultar huellas.", null, $e->getMessage());
         }
     }
 }

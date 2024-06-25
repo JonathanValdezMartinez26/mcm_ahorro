@@ -270,7 +270,7 @@ $derecha = new TarjetaMano('derecha');
                                                 <i class="fa fa-times red" id="chkPagoApertura"></i><span style="color: #000; user-select: none;">Deposito de apertura</span>
                                             </div>
                                             <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
-                                                <i class="fa fa-times red" id="chkRegistroHuellas"></i><a href="javascript:void(0);" onclick=mostrarModalHuellas() style="color: #000; cursor: default;" id="lnkContrato">Registro de Huellas</a>
+                                                <i class="fa fa-times red" id="chkRegistroHuellas"></i><a href="javascript:void(0);" onclick=mostrarModalHuellas() style="color: #000; cursor: default;" id="lnkHuellas">Registro de Huellas</a>
                                             </div>
                                         </div>
                                         <div class="modal-footer" style="height: 20px;">
@@ -320,6 +320,7 @@ $derecha = new TarjetaMano('derecha');
                         <?= $izquierda->mostrar(); ?>
                         <?= $derecha->mostrar(); ?>
                     </div>
+                    <br>
                     <div class="row">
                         <div id="notificacionesHuella" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50px;">
                             <span id="mensajeHuella" style="font-size: x-large">Capture las huellas del cliente.</span>
