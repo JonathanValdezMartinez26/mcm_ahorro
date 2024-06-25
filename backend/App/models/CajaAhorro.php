@@ -55,7 +55,7 @@ class CajaAhorro
         return $mysqli->queryAll($query);
     }
 
-    public static function GetCatalogoParentesco()
+    public static function GetCatalogoParentescos()
     {
         $query = <<<sql
         SELECT
@@ -76,11 +76,8 @@ class CajaAhorro
 
     public static function GetSucursalAsignadaCajeraAhorro($usuario = '')
     {
-        if ($usuario == '') {
-            $var =  '';
-        } else {
-            $var = "WHERE SUC_CAJERA_AHORRO.CDG_USUARIO = '" . $usuario . "'";
-        }
+        $var = $usuario == "" ? "" : "WHERE SUC_CAJERA_AHORRO.CDG_USUARIO = '" . $usuario . "'";
+
         $query = <<<sql
         SELECT
             CO.CODIGO, CO.NOMBRE  

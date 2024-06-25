@@ -1386,7 +1386,7 @@ script;
         }
 
 
-        $opcOperaciones .= <<<html
+        $opcOperaciones = <<<html
             <option value="0" $sel_op0>TODAS LAS OPERACIONES CON EFECTIVO</option>
             
             
@@ -1410,7 +1410,7 @@ html;
         }
 
 
-        $opcProductos .= <<<html
+        $opcProductos = <<<html
             <option value="0" $sel_pro0>TODOS LOS PRODUCTOS QUE MANEJAN EFECTIVO</option>
             <option value="1" $sel_pro1>AHORRO CUENTA - CORRIENTE</option>
             <option value="2" $sel_pro2>AHORRO CUENTA - PEQUES</option>
@@ -1566,7 +1566,7 @@ script;
         }
 
 
-        $opcOperaciones .= <<<html
+        $opcOperaciones = <<<html
             <option value="0" $sel_op0>TODAS LAS OPERACIONES CON EFECTIVO</option>
             
             
@@ -1590,7 +1590,7 @@ html;
         }
 
 
-        $opcProductos .= <<<html
+        $opcProductos = <<<html
             <option value="0" $sel_pro0>TODOS LOS PRODUCTOS QUE MANEJAN EFECTIVO</option>
             <option value="1" $sel_pro1>AHORRO CUENTA - CORRIENTE</option>
             <option value="2" $sel_pro2>AHORRO CUENTA - PEQUES</option>
@@ -1833,7 +1833,7 @@ script;
 
 
         $Transacciones = CajaAhorroDao::GetSolicitudesPendientesAdminAll();
-
+        $tabla = "";
         foreach ($Transacciones as $key => $value) {
 
             $tabla .= <<<html
@@ -1872,7 +1872,7 @@ html;
         }
 
         $TransaccionesHistorial = CajaAhorroDao::GetSolicitudesHistorialAdminAll();
-
+        $tabla_his = "";
         foreach ($TransaccionesHistorial as $key_ => $valueh) {
             if ($valueh['AUTORIZA'] == '1') {
                 $estatus = 'ACEPTADO';
@@ -2025,10 +2025,11 @@ script;
         $Operacion = $_GET['Operacion'];
         $Producto = $_GET['Producto'];
         $Sucursal = $_GET['Sucursal'];
-
+        $opcSucursales = "";
+        $situacion_credito = 0;
 
         $Transacciones = CajaAhorroDao::GetSolicitudesPendientesAdminAll();
-
+        $tabla = "";
         foreach ($Transacciones as $key => $value) {
 
             $tabla .= <<<html
@@ -2609,10 +2610,12 @@ script;
         $Operacion = $_GET['Operacion'];
         $Producto = $_GET['Producto'];
         $Sucursal = $_GET['Sucursal'];
+        $opcSucursales = "";
+        $situacion_credito = "";
 
 
         $Transacciones = CajaAhorroDao::GetSolicitudesPendientesAdminAll();
-
+        $tabla = "";
         foreach ($Transacciones as $key => $value) {
 
             $tabla .= <<<html
@@ -2737,7 +2740,8 @@ html;
         </script>
 script;
 
-
+        $opcSucursales = "";
+        $tabla = "";
         View::set('header', $this->_contenedor->header(self::GetExtraHeader("Configuración de Caja")));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::set('opcSucursales', $opcSucursales);
@@ -3202,19 +3206,16 @@ script;
 
             ///////////////////////
             $increment = $keyy++;
-            if ( $Layoutt[$increment]["CONCEPTO"] == 'DEPOSITO'
+            if (
+                $Layoutt[$increment]["CONCEPTO"] == 'DEPOSITO'
                 || $Layoutt[$increment]["CONCEPTO"] == 'CAPITAL INICIAL - CUENTA CORRIENTE'
                 || $Layoutt[$increment]["CONCEPTO"] == 'APERTURA DE CUENTA - INSCRIPCIÓN'
-                || $Layoutt[$increment]["CONCEPTO"] == 'FONDEO SUCURSAL')
-            {
+                || $Layoutt[$increment]["CONCEPTO"] == 'FONDEO SUCURSAL'
+            ) {
                 $totalSaldo += $Layoutt[$increment]["INGRESO"];
-
-            }
-            else if($Layoutt[$increment]["CONCEPTO"] == 'SALDO INICIAL DEL DIA (DIARIO)')
-            {
+            } else if ($Layoutt[$increment]["CONCEPTO"] == 'SALDO INICIAL DEL DIA (DIARIO)') {
                 $totalSaldo += $Layoutt[$increment]["REPORTE"];
-            }else
-            {
+            } else {
                 $totalSaldo -= $Layoutt[$increment]["EGRESO"];
             }
 
@@ -3227,7 +3228,7 @@ script;
         }
         //exit();
         $fila += 1;
-        $totalSaldo = $totalSaldo ;
+        $totalSaldo = $totalSaldo;
 
         $objPHPExcel->getActiveSheet()->SetCellValue($columna[7] . $fila, "TOTAL");
         $objPHPExcel->getActiveSheet()->getStyle($columna[7] . $fila)->applyFromArray($estilo_encabezado);
@@ -3264,12 +3265,12 @@ script;
 
         \PHPExcel_Settings::setZipClass(\PHPExcel_Settings::PCLZIP);
         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+
         $objWriter->save('php://output');
     }
 
     public function generarExcelPagosTransaccionesDetalleAll()
     {
-
         $fecha_inicio = $_GET['Inicial'];
         $fecha_fin = $_GET['Final'];
         $operacion = $_GET['Operacion'];
@@ -3351,15 +3352,15 @@ script;
         $objPHPExcel->getActiveSheet()->getStyle($columna[7] . $fila)->applyFromArray($estilo_encabezado);
         $objPHPExcel->getActiveSheet()->getStyle($columna[7] . $fila)->getAlignment()->setWrapText($adaptarTexto);
 
-        $objPHPExcel->getActiveSheet()->SetCellValue($columna[8] . $fila, $totalIngreso);
+        $objPHPExcel->getActiveSheet()->SetCellValue($columna[8] . $fila, 0);
         $objPHPExcel->getActiveSheet()->getStyle($columna[8] . $fila)->applyFromArray($estilo_celda);
         $objPHPExcel->getActiveSheet()->getStyle($columna[8] . $fila)->getAlignment()->setWrapText($adaptarTexto);
 
-        $objPHPExcel->getActiveSheet()->SetCellValue($columna[9] . $fila, $totalEgreso);
+        $objPHPExcel->getActiveSheet()->SetCellValue($columna[9] . $fila, 0);
         $objPHPExcel->getActiveSheet()->getStyle($columna[9] . $fila)->applyFromArray($estilo_celda);
         $objPHPExcel->getActiveSheet()->getStyle($columna[9] . $fila)->getAlignment()->setWrapText($adaptarTexto);
 
-        $objPHPExcel->getActiveSheet()->SetCellValue($columna[10] . $fila, $totalSaldo);
+        $objPHPExcel->getActiveSheet()->SetCellValue($columna[10] . $fila, 0);
         $objPHPExcel->getActiveSheet()->getStyle($columna[10] . $fila)->applyFromArray($estilo_celda);
         $objPHPExcel->getActiveSheet()->getStyle($columna[10] . $fila)->getAlignment()->setWrapText($adaptarTexto);
 
@@ -3367,7 +3368,6 @@ script;
         for ($i = 0; $i < $fila; $i++) {
             $objPHPExcel->getActiveSheet()->getRowDimension($i)->setRowHeight(20);
         }
-
 
         $objPHPExcel->getActiveSheet()->setTitle('Reporte');
 

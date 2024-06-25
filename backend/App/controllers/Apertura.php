@@ -7,7 +7,6 @@ defined("APPPATH") or die("Access denied");
 use \Core\View;
 use \Core\Controller;
 use \App\models\Apertura as AperturaDao;
-use \mPDF;
 
 class Apertura extends Controller
 {
@@ -433,7 +432,9 @@ html;
 
     $nombreArchivo = "Contrato " . $numero_contrato;
 
-    $mpdf = new Mpdf('c');
+    $mpdf = new \mPDF([
+      'mode' => 'c',
+    ]);
     $mpdf->defaultPageNumStyle = 'I';
     $mpdf->h2toc = array('H5' => 0, 'H6' => 1);
     $mpdf->SetTitle($nombreArchivo);
@@ -700,7 +701,9 @@ html;
 
 
     $nombreArchivo = "Contrato " . $numero_contrato;
-    $mpdf = new \mPDF('c');
+    $mpdf = new \mPDF([
+      'mode' => 'c',
+    ]);
     $mpdf->defaultPageNumStyle = 'I';
     $mpdf->h2toc = array('H5' => 0, 'H6' => 1);
     $mpdf->SetTitle($nombreArchivo);
@@ -967,7 +970,9 @@ html;
 
 
     $nombreArchivo = "Contrato " . $numero_contrato;
-    $mpdf = new \mPDF('c');
+    $mpdf = new \mPDF([
+      'mode' => 'c',
+    ]);
     $mpdf->defaultPageNumStyle = 'I';
     $mpdf->h2toc = array('H5' => 0, 'H6' => 1);
     $mpdf->SetTitle($nombreArchivo);

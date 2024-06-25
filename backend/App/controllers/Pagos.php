@@ -540,6 +540,7 @@ html;
 html;
 
         $tabla = '';
+        $opciones_suc = '';
 
 
         $Administracion = PagosDao::ConsultarDiasFestivos();
@@ -1120,6 +1121,7 @@ html;
                     $fin_f = $fechaActual;
                 }
 
+                $tabla_resumen = '';
                 foreach ($AdministracionResumen[0] as $key => $value_resumen) {
 
                     $ejecutivo = $value_resumen['EJECUTIVO'];
@@ -1180,7 +1182,9 @@ html;
 
     public function Ticket($barcode)
     {
-        $mpdf = new \mPDF('c');
+        $mpdf = new \mPDF([
+            'mode' => 'c',
+        ]);
         $mpdf->defaultPageNumStyle = 'I';
         $mpdf->h2toc = array('H5' => 0, 'H6' => 1);
 
@@ -1525,6 +1529,7 @@ html;
         if ($Inicial != '' && $Final != '') {
             $Consulta = PagosDao::ConsultarPagosFechaSucursal($id_sucursal, $Inicial, $Final);
 
+            $tabla = '';
             foreach ($Consulta as $key => $value) {
                 if ($value['FIDENTIFICAPP'] ==  NULL) {
                     $medio = '<span class="count_top" style="font-size: 25px"><i class="fa fa-female"></i></span>';
@@ -2015,32 +2020,22 @@ html;
 
         if ($horaActual <= $hora_cierre) {
             if ($dia == 1) {
-                if($fue_dia_festivo == 4)
-                {
+                if ($fue_dia_festivo == 4) {
                     $date_past = strtotime('-6 days', strtotime($fechaActual));
                     $date_past = date('Y-m-d', $date_past);
-                }
-                else if($fue_dia_festivo == 3)
-                {
+                } else if ($fue_dia_festivo == 3) {
                     $date_past = strtotime('-5 days', strtotime($fechaActual));
                     $date_past = date('Y-m-d', $date_past);
-                }
-                else if($fue_dia_festivo == 2)
-                {
+                } else if ($fue_dia_festivo == 2) {
                     $date_past = strtotime('-4 days', strtotime($fechaActual));
                     $date_past = date('Y-m-d', $date_past);
-                }
-                else if($fue_dia_festivo == 1)
-                {
+                } else if ($fue_dia_festivo == 1) {
+                    $date_past = strtotime('-3 days', strtotime($fechaActual));
+                    $date_past = date('Y-m-d', $date_past);
+                } else {
                     $date_past = strtotime('-3 days', strtotime($fechaActual));
                     $date_past = date('Y-m-d', $date_past);
                 }
-                else
-                {
-                    $date_past = strtotime('-3 days', strtotime($fechaActual));
-                    $date_past = date('Y-m-d', $date_past);
-                }
-
             } else {
                 if ($fue_dia_festivo == 1 && $dia == 2) {
                     $date_past = strtotime('-4 days', strtotime($fechaActual));
@@ -2065,6 +2060,7 @@ html;
 
 
         $status = PagosDao::ListaEjecutivosAdmin($credito);
+        $getStatus = '';
         foreach ($status[0] as $key => $val2) {
             if ($status[1] == $val2['ID_EJECUTIVO']) {
                 $select = 'selected';
@@ -2114,28 +2110,19 @@ html;
 
 
 
-                        if($fue_dia_festivo == 4)
-                        {
+                        if ($fue_dia_festivo == 4) {
                             $date_past_b = strtotime('-6 days', strtotime($fechaActual));
                             $date_past_b = date('Y-m-d', $date_past_b);
-                        }
-                        else if($fue_dia_festivo == 3)
-                        {
+                        } else if ($fue_dia_festivo == 3) {
                             $date_past_b = strtotime('-5 days', strtotime($fechaActual));
                             $date_past_b = date('Y-m-d', $date_past_b);
-                        }
-                        else if($fue_dia_festivo == 2)
-                        {
+                        } else if ($fue_dia_festivo == 2) {
                             $date_past_b = strtotime('-4 days', strtotime($fechaActual));
                             $date_past_b = date('Y-m-d', $date_past_b);
-                        }
-                        else if($fue_dia_festivo == 1)
-                        {
+                        } else if ($fue_dia_festivo == 1) {
                             $date_past_b = strtotime('-3 days', strtotime($fechaActual));
                             $date_past_b = date('Y-m-d', $date_past_b);
-                        }
-                        else
-                        {
+                        } else {
                             $date_past_b = strtotime('-3 days', strtotime($fechaActual));
                             $date_past_b = date('Y-m-d', $date_past_b);
                         }
@@ -2423,6 +2410,7 @@ html;
 
 
         $status = PagosDao::ListaEjecutivosAdmin($credito);
+        $getStatus = '';
         foreach ($status[0] as $key => $val2) {
             if ($status[1] == $val2['ID_EJECUTIVO']) {
                 $select = 'selected';
@@ -2579,6 +2567,7 @@ html;
         $CorteCajaById = PagosDao::getAllCorteCajaByID($consolidado);
 
 
+        $extraHeader = '';
         if ($consolidado != '') {
             $CorteCaja = PagosDao::getAllByIdCorteCaja(1);
 
@@ -2639,7 +2628,6 @@ html;
                 </tr>
 html;
             }
-
             /////////////////////////////////////////////////////////////////
             /// Sirve para decir que la consulta viene vacia, mandar mernsaje de vacio
             if ($CorteCaja[0] == '') {

@@ -143,7 +143,6 @@ html;
     View::set('footer', $this->_contenedor->footer($extraFooter));
     View::set('Cliente', $BuscaCliente);
     View::render("inversiones_menu");
-
   }
 
   public function AgregaContrato()
@@ -277,7 +276,9 @@ html;
 
 
     $nombreArchivo = "Contrato " . $numero_contrato;
-    $mpdf = new \mPDF('c');
+    $mpdf = new \mPDF([
+      'mode' => 'c',
+    ]);
     $mpdf->defaultPageNumStyle = 'I';
     $mpdf->h2toc = array('H5' => 0, 'H6' => 1);
     $mpdf->SetTitle($nombreArchivo);

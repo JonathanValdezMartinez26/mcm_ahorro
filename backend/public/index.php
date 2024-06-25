@@ -1,6 +1,7 @@
 <?php
 // Solo se reportan los errores y se ignoran las advertencias
 error_reporting(E_ERROR | E_PARSE);
+// error_reporting(E_ALL);
 
 // Configuración de la zona horaria para contemplar horario de verano
 $validaHV = new DateTime('now', new DateTimeZone('America/Mexico_City'));

@@ -262,15 +262,15 @@ $derecha = new TarjetaMano('derecha');
                                             </div>
                                         </div>
                                         <div class="row" id="marcadores" style="height: 20px; opacity: 0">
-                                            <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
+                                            <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
                                                 <input id="contratoOK" type="hidden" />
                                                 <i class="fa fa-times red" id="chkCreacionContrato"></i><a href="javascript:void(0);" onclick=reImprimeContrato(event) style="color: #000; cursor: default;" id="lnkContrato">Creación del contrato</a>
                                             </div>
-                                            <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
+                                            <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
                                                 <i class="fa fa-times red" id="chkPagoApertura"></i><span style="color: #000; user-select: none;">Deposito de apertura</span>
                                             </div>
-                                            <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
-                                                <i class="fa fa-times red" id="chkRegistroHuellas"></i><a href="javascript:void(0);" onclick=mostrarModalHuellas() style="color: #000; cursor: default;" id="lnkContrato">Registrar Huellas</a>
+                                            <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
+                                                <i class="fa fa-times red" id="chkRegistroHuellas"></i><a href="javascript:void(0);" onclick=mostrarModalHuellas() style="color: #000; cursor: default;" id="lnkContrato">Registro de Huellas</a>
                                             </div>
                                         </div>
                                         <div class="modal-footer" style="height: 20px;">

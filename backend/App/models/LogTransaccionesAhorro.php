@@ -9,7 +9,7 @@ use Exception;
 
 class LogTransaccionesAhorro
 {
-    public function BindingQuery($qry, $parametros = null)
+    public static function BindingQuery($qry, $parametros = null)
     {
         if ($parametros) {
             foreach ($parametros as $parametro => $valor)

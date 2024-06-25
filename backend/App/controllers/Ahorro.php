@@ -416,8 +416,8 @@ class Ahorro extends Controller
         }
     }';
     private $validaHorarioOperacion = 'const validaHorarioOperacion = (inicio, fin, sinMsj = false) => {
-        inicio = "01:00:00"    
-        fin = "24:00:00"
+        // inicio = "01:00:00"    
+        // fin = "24:00:00"
         const horaActual = new Date()
         const horaInicio = new Date()
         const horaFin = new Date()
@@ -652,7 +652,7 @@ class Ahorro extends Controller
             }
                         
             const pagoApertura = async (e) => {
-                if (!await valida_MCM_Complementos()) return
+                //if (!await valida_MCM_Complementos()) return
                  
                 e.preventDefault()
                 if (parseaNumero(document.querySelector("#deposito").value) < saldoMinimoApertura) return showError("El saldo inicial no puede ser menor a " + saldoMinimoApertura.toLocaleString("es-MX", {style:"currency", currency:"MXN"}) + ".")
@@ -703,7 +703,7 @@ class Ahorro extends Controller
                         showSuccess("Se ha generado el contrato: " + contrato + ".")
                         .then(() => {
                             imprimeContrato(contrato, 1)
-                            imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
+                            //imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
                         })
                     })
                 })
@@ -911,7 +911,7 @@ class Ahorro extends Controller
 
                 if (valContrato) return showError("Debe completar el proceso de creación del contrato.")
                 if (valPago) return showError("Debe completar el proceso de pago de apertura.")
-                
+
                 $("#modal_registra_huellas").modal("show")
             }
          
@@ -977,7 +977,6 @@ class Ahorro extends Controller
             }
         </script>
         html;
-
 
         $sucursales = CajaAhorroDao::GetSucursalAsignadaCajeraAhorro($this->__usuario);
         $opcSucursales = "";
@@ -3878,7 +3877,18 @@ class Ahorro extends Controller
 
         $nombreArchivo = "Contrato de " . $productos[$_GET['producto']];
 
-        $mpdf = new \mPDF('utf-8', 'Letter', 11.5, 'Arial', 5, 5, 10, 10, 0, 5);
+        $mpdf = new \mPDF([
+            'mode' => 'utf-8',
+            'format' => 'Letter',
+            'default_font_size' => 11.5,
+            'default_font' => 'Arial',
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'margin_header' => 0,
+            'margin_footer' => 5,
+        ]);
         $mpdf->SetDefaultBodyCSS('text-align', 'justify');
         $fi = date('d/m/Y H:i:s');
         $pie = <<< html
@@ -3918,8 +3928,18 @@ class Ahorro extends Controller
             $mensajeImpresion = 'Fecha y sucursal de impresión:<br>' . date('d/m/Y H:i:s') . ' - ' . $datosImpresion['NOMBRE'] . ' (' . $datosImpresion['CODIGO'] . ')';
         }
 
-
-        $mpdf = new \mPDF('UTF-8', array(80, 190), 10, 'Arial', 0, 0, 0, 0, 0, 5);
+        $mpdf = new \mPDF([
+            'mode' => 'utf-8',
+            'format' => [80, 190],
+            'default_font_size' => 10,
+            'default_font' => 'Arial',
+            'margin_left' => 0,
+            'margin_right' => 0,
+            'margin_top' => 0,
+            'margin_bottom' => 0,
+            'margin_header' => 0,
+            'margin_footer' => 5,
+        ]);
         // PIE DE PAGINA
         $mpdf->SetHTMLFooter('<div style="text-align:center;font-size:10px;font-family:Arial;">' . $mensajeImpresion . '</div>');
         $mpdf->SetTitle($nombreArchivo);
@@ -4084,8 +4104,18 @@ class Ahorro extends Controller
 
         $nombreArchivo = "Ticket Arqueo " . $datos['CDG_ARQUEO'];
 
-        $mpdf = new \mPDF('UTF-8', array(90, 190), 10, 'Arial', 10, 10, 0, 0, 0, 5);
-
+        $mpdf = new \mPDF([
+            'mode' => 'utf-8',
+            'format' => [90, 190],
+            'default_font_size' => 10,
+            'default_font' => 'Arial',
+            'margin_left' => 0,
+            'margin_right' => 0,
+            'margin_top' => 0,
+            'margin_bottom' => 0,
+            'margin_header' => 0,
+            'margin_footer' => 5,
+        ]);
         // PIE DE PAGINA
         $mpdf->SetHTMLFooter('<div style="text-align:center;font-size:10px;font-family:Arial;">Fecha de impresión:<br>' . date('d/m/Y H:i:s') . '</div>');
         $mpdf->SetTitle($nombreArchivo);
@@ -4307,7 +4337,11 @@ class Ahorro extends Controller
 
         $nombreArchivo = "Estado de Cuenta: " . $_GET['cliente'];
 
-        $mpdf = new \mPDF('utf-8', 'Letter', 10, 'Arial');
+        $mpdf = new \mPDF([
+            'mode' => 'utf-8',
+            'format' => 'Letter',
+            'default_font_size' => 10
+        ]);
         $fi = date('d/m/Y H:i:s');
         $pie = <<< html
         <table style="width: 100%; font-size: 10px">
