@@ -54,13 +54,6 @@ $derecha = new TarjetaMano('derecha');
                     <! -- https://cdn-icons-png.flaticon.com/512/942/942752.png -->
                 </div>
             </a>
-            <!--<a id="link" href="/Ahorro/Calculadora/">
-                     <div class="col-md-5" style="margin-top: 20px; margin-left: 0px; border: 1px solid #dfdfdf; border-radius: 10px;">
-                         <img src="https://cdn-icons-png.flaticon.com/512/5833/5833832.png" style="border-radius: 3px; padding-top: 5px;" width="98" height="110">
-                         <p style="font-size: 12px; padding-top: 6px; color: #000000"><b>Calculadora  </b></p>
-
-                     </div>
-                 </a>-->
         </div>
         <div class="col-md-9">
             <div class="modal-content">
@@ -276,6 +269,9 @@ $derecha = new TarjetaMano('derecha');
                                             <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
                                                 <i class="fa fa-times red" id="chkPagoApertura"></i><span style="color: #000; user-select: none;">Deposito de apertura</span>
                                             </div>
+                                            <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
+                                                <i class="fa fa-times red" id="chkRegistroHuellas"></i><a href="javascript:void(0);" onclick=mostrarModalHuellas() style="color: #000; cursor: default;" id="lnkContrato">Registrar Huellas</a>
+                                            </div>
                                         </div>
                                         <div class="modal-footer" style="height: 20px;">
                                             <button id="btnGeneraContrato" class="btn btn-primary" onclick="generaContrato(event)" style="border: 1px solid #c4a603; background: #ffffff; display: none;">
@@ -284,7 +280,6 @@ $derecha = new TarjetaMano('derecha');
                                             </button>
                                         </div>
                                         <br>
-
                                     </form>
                                     <br>
                                 </div>

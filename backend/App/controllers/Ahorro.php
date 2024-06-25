@@ -637,10 +637,6 @@ class Ahorro extends Controller
             
             const generaContrato = async (e) => {
                 e.preventDefault()
-                $("#modal_registra_huellas").modal("show")
-            }
-         
-            const genContrato = async () => {
                 const btnGuardar = document.querySelector("#btnGuardar")
                 if (btnGuardar.innerText === txtGuardaPago) return $("#modal_agregar_pago").modal("show")
                  
@@ -908,6 +904,16 @@ class Ahorro extends Controller
                  
                 imprimeContrato(c)
             }
+
+            const mostrarModalHuellas = () => {
+                const valContrato = document.querySelector("#chkCreacionContrato").classList.contains("red")
+                const valPago = document.querySelector("#chkPagoApertura").classList.contains("red")
+
+                if (valContrato) return showError("Debe completar el proceso de creación del contrato.")
+                if (valPago) return showError("Debe completar el proceso de pago de apertura.")
+                
+                $("#modal_registra_huellas").modal("show")
+            }
          
             const huellasCompletas = (e) => {
                 if (manoDerecha.manoLista() && manoIzquierda.manoLista()) {
@@ -945,11 +951,6 @@ class Ahorro extends Controller
             }
          
             const validaHuella = (e) => {
-                if (e.detail.erroresValidacion >= 5) {
-                    document.querySelector("#mensajeHuella").innerText = "Se ha alcanzado el número máximo de intentos, comuníquese con el administrador."
-                    return
-                }
-         
                 const datos = {
                     cliente: document.querySelector("#noCliente").value || "bto",
                     dedo: e.detail.dedo,
@@ -970,7 +971,7 @@ class Ahorro extends Controller
                         const botones = document.querySelectorAll(".btnHuella")
                         if (Array.from(botones).every(boton => boton.style.display !== "none"))
                             $("#modal_registra_huellas").modal("hide")
-                            // genContrato()
+
                     })
                 })
             }

@@ -9,24 +9,6 @@ use \App\models\LogTransaccionesAhorro;
 use Exception;
 use DateTime;
 
-/**
- * Tablas de registros:
- * - ASIGNA_PROD_AHORRO
- * - BENEFICIARIOS_AHORRO
- * - MOVIMIENTOS_AHORRO
- * - TICKETS_AHORRO
- * - CUENTA_INVERSION
- * - CL_PQS
- *
- * Limpieza de tablas:
- * DELETE FROM ASIGNA_PROD_AHORRO;
- * DELETE FROM BENEFICIARIOS_AHORRO;
- * DELETE FROM MOVIMIENTOS_AHORRO;
- * DELETE FROM TICKETS_AHORRO;
- * DELETE FROM CUENTA_INVERSION;
- * DELETE FROM CL_PQS;
- */
-
 class CajaAhorro
 {
     public static function Responde($respuesta, $mensaje, $datos = null, $error = null)
@@ -73,7 +55,7 @@ class CajaAhorro
         return $mysqli->queryAll($query);
     }
 
-    public static function GetCatalogoParentescos()
+    public static function GetCatalogoParentesco()
     {
         $query = <<<sql
         SELECT
