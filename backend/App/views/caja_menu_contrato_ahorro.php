@@ -323,7 +323,7 @@ $derecha = new TarjetaMano('derecha');
                     <br>
                     <div class="row">
                         <div id="notificacionesHuella" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50px;">
-                            <span id="mensajeHuella" style="font-size: x-large">Capture las huellas del cliente.</span>
+                            <span id="mensajeHuella" style="font-size: x-large">Capture las huellas del cliente, haga clic sobre una imagen.</span>
                         </div>
                     </div>
                     <div class="modal-footer">

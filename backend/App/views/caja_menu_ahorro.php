@@ -115,11 +115,10 @@ $dedo = new TarjetaDedo("izquierda", 1);
                                     <button type="button" class="btn btn-primary" id="btnBskClnt" onclick="buscaCliente()" style="margin-top: 25px;">
                                         <i class="fa fa-search"></i> Buscar
                                     </button>
-                                    <div style="height: 80%; display: flex;" onclick=showBloqueoHuella()>
+                                    <div style="height: 80%; display: flex;" onclick=showHuella()>
                                         <?= $dedo->imagen(); ?>
                                     </div>
                                 </div>
-                                <!-- </div> -->
                             </div>
                             <div class="row">
                                 <div class="col-md-6">

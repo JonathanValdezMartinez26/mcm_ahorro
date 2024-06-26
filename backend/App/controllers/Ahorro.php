@@ -677,7 +677,7 @@ class Ahorro extends Controller
             }
                         
             const pagoApertura = async (e) => {
-                //if (!await valida_MCM_Complementos()) return
+                if (!await valida_MCM_Complementos()) return
                  
                 e.preventDefault()
                 if (parseaNumero(document.querySelector("#deposito").value) < saldoMinimoApertura) return showError("El saldo inicial no puede ser menor a " + saldoMinimoApertura.toLocaleString("es-MX", {style:"currency", currency:"MXN"}) + ".")
@@ -1075,12 +1075,7 @@ class Ahorro extends Controller
             "mensaje" => "No se ha podido validar la huella."
         ];
 
-        $datosSQL = [
-            "cliente" => $_POST['cliente'],
-            "dedo" => $_POST['dedo']
-        ];
-
-        $huellas = CajaAhorroDao::GetHuellas($datosSQL);
+        $huellas = CajaAhorroDao::GetHuellas($_POST['cliente']);
 
         if (count($huellas) == 0) {
             $repuesta['mensaje'] = "No se encontraron registros en la base de datos.";
@@ -1098,11 +1093,14 @@ class Ahorro extends Controller
             "huellas" => json_encode($huellasEngine)
         ];
 
-        $resultado = self::EngineHuellas("valida.php", $datosEngine);
+        $resultado = self::EngineHuellas("identifica.php", $datosEngine);
         $repuesta["resultado"] = $resultado;
 
         $repuesta["success"] = $resultado["success"];
         $repuesta["mensaje"] = $resultado["mensaje"];
+        if ($resultado["success"]) {
+            $repuesta["cliente"] = $huellas[$resultado["coincidencia"]]["CLIENTE"];
+        }
 
         echo json_encode($repuesta);
     }
@@ -1140,6 +1138,7 @@ class Ahorro extends Controller
             const montoMaximoDeposito = $montoMaximoDeposito
             const maximoRetiroDia = $maximoRetiroDia
             const noSucursal = "{$_SESSION['cdgco_ahorro']}"
+            let huellas = 0
             let retiroDispobible = maximoRetiroDia
             let mano
          
@@ -1171,13 +1170,13 @@ class Ahorro extends Controller
                 if(document.querySelector("#clienteBuscado").value !== "") buscaCliente()
             }
          
-            const showBloqueoHuella = () => {
+            const showHuella = (autorizacion = false, datos =  null) => {
                 Swal.fire({
                     html: `<span id="mensajeHuella">Esperando autorización del cliente.</span>{$tarjetaDedo->mostrar()}`,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
-                    allowEnterKey: false,
                     showConfirmButton: false,
+                    showCloseButton: true,
                     target: document.getElementById("bloqueoAhorro"),
                     customClass: {
                         container: "sweet-bloqueoAhorro-container",
@@ -1185,20 +1184,21 @@ class Ahorro extends Controller
                         htmlContainer: "sweet-bloqueo-mano",
                     }
                 })
-         
+        
                 const lector = new LectorHuellas(
                 {
                     notificacion: (mensaje, error = false) => {
                         const huella = document.querySelector("#mensajeHuella")
                         huella.style.color = error ? "red": ""
-                        
                         huella.innerText = mensaje
                     }
                 })
                 mano = new Mano("manoIzquierda", lector, document.querySelector(".sweet-bloqueo-mano"))
                 mano.modoAutorizacion()
-         
-                document.querySelector(".sweet-bloqueo-mano").addEventListener("validaHuella", validaHuella)
+                mano.datosCliente = datos
+        
+                accion = autorizacion ? autorizaOperacion : validaHuella
+                document.querySelector(".sweet-bloqueo-mano").addEventListener("validaHuella", accion)
             }
          
             const llenaDatosCliente = (datosCliente) => {
@@ -1210,7 +1210,7 @@ class Ahorro extends Controller
                         blkRetiro = true
                         retiroDispobible = maximoRetiroDia - respuesta.datos.RETIROS
                     }
-                    
+                    huellas = datosCliente.HUELLAS
                     document.querySelector("#nombre").value = datosCliente.NOMBRE
                     document.querySelector("#curp").value = datosCliente.CURP
                     document.querySelector("#contrato").value = datosCliente.CONTRATO
@@ -1329,7 +1329,7 @@ class Ahorro extends Controller
             }
              
             const registraOperacion = async (e) => {
-                if (!await valida_MCM_Complementos()) return
+                //if (!await valida_MCM_Complementos()) return
                  
                 e.preventDefault()
                 const datos = $("#registroOperacion").serializeArray()
@@ -1354,40 +1354,78 @@ class Ahorro extends Controller
                     + " (" + document.querySelector("#monto_letra").value + ")?"
                 ).then((continuar) => {
                     if (!continuar) return
-                    consultaServidor("/Ahorro/RegistraOperacion/", $.param(datos), (respuesta) => {
-                        if (!respuesta.success){
-                            if (respuesta.error) return showError(respuesta.error)
-                            return showError(respuesta.mensaje)
-                        }
-                        showSuccess(respuesta.mensaje).then(() => {
-                            imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
-                            limpiaDatosCliente()
-                        })
+                    if (!document.querySelector("#deposito").checked && huellas > 0) {
+                        return showHuella(true, datos)
+                    }
+                    enviaRegistroOperacion(datos)
+                })
+            }
+
+            const enviaRegistroOperacion = (datos) => {
+                consultaServidor("/Ahorro/RegistraOperacion/", $.param(datos), (respuesta) => {
+                    if (!respuesta.success){
+                        if (respuesta.error) return showError(respuesta.error)
+                        return showError(respuesta.mensaje)
+                    }
+                    showSuccess(respuesta.mensaje).then(() => {
+                        imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
+                        limpiaDatosCliente()
                     })
                 })
             }
          
             const validaHuella = (e) => {
-                if (e.detail.erroresValidacion >= 5) {
-                    document.querySelector("#mensajeHuella").innerText = "Se ha alcanzado el número máximo de intentos, comuníquese con el administrador."
-                    return
-                }
-         
                 const datos = {
-                    dedo: e.detail.dedo,
                     muestra: e.detail.muestra
                 }
          
                 consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
-                    e.detail.imagen.setAttribute("fill", (respuesta.success ? "green" : "red"))
+                    e.detail.colorImagen(respuesta.success ? "green" : "red")
                     if (!respuesta.success) {
                         e.detail.conteoErrores()
+                        e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
                         return showError(respuesta.mensaje)
                     }
-         
-                    showSuccess(respuesta.mensaje).then(() => {
+                        
+                    if (respuesta.cliente) {
+                        document.querySelector("#clienteBuscado").value = respuesta.cliente
+                        buscaCliente()
+                    }
+                    Swal.close()
+                })
+            }
+
+            const autorizaOperacion = (e) => {
+                if (e.detail.erroresValidacion >= 5) {
+                    showError("Se ha alcanzado el límite de intentos para validar la huella, la operación no se puede completar.")
+                    .then(() => {
                         Swal.close()
+                        limpiaDatosCliente()
+                        return
                     })
+                    return
+                }
+
+                const datos = {
+                    muestra: e.detail.muestra
+                }
+         
+                consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
+                    e.detail.colorImagen(respuesta.success ? "green" : "red")
+                    if (!respuesta.success) {
+                        e.detail.conteoErrores()
+                        e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
+                        return showError(respuesta.mensaje)
+                    }
+                    
+                    Swal.close()
+                    if (respuesta.cliente && document.querySelector("#cliente").value !== respuesta.cliente) {
+                        showError("La huella corresponde a otro cliente, comuníquese con su administrador.").
+                        then(() => {
+                            limpiaDatosCliente()
+                        })
+                    }
+                    showSuccess(respuesta.mensaje).then(() => enviaRegistroOperacion(mano.datosCliente))
                 })
             }
         </script>
