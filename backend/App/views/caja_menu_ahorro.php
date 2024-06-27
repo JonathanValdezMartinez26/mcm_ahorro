@@ -2,9 +2,10 @@
 
 <?php
 
-use App\components\TarjetaDedo;
+use App\components\BuscarCliente;
 
-$dedo = new TarjetaDedo("izquierda", 1);
+$buscarCliente = new BuscarCliente('Para realizar un movimiento es necesario que el cliente tenga una cuenta ahorro corriente activa, de lo contrario, es necesaria la creación de una a través de la opción: <a href="/Ahorro/ContratoCuentaCorriente/" target="_blank">Nuevo Contrato</a>.');
+
 ?>
 
 <div class="right_col">
@@ -102,24 +103,7 @@ $dedo = new TarjetaDedo("izquierda", 1);
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
-                            <div class="row" style="height: 100px; display: flex; align-items: flex-start;">
-                                <div class="col-md-6">
-                                    <p>Para realizar un movimiento es necesario que el cliente tenga una cuenta ahorro corriente activa, de lo contrario, es necesaria la creación de una a través de la opción: <a href="/Ahorro/ContratoCuentaCorriente/" target="_blank">Nuevo Contrato</a>.</p>
-                                    <hr>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="movil">Código de cliente SICAFIN *</label>
-                                    <input type="text" onkeypress=validarYbuscar(event) class="form-control" id="clienteBuscado" name="clienteBuscado" placeholder="000000" value="<?= $cliente ?>" required>
-                                </div>
-                                <div class="col-md-3" style="display: flex; align-items: flex-start; justify-content: space-between; height: 100%;">
-                                    <button type="button" class="btn btn-primary" id="btnBskClnt" onclick="buscaCliente()" style="margin-top: 25px;">
-                                        <i class="fa fa-search"></i> Buscar
-                                    </button>
-                                    <div style="height: 80%; display: flex;" onclick=showHuella()>
-                                        <?= $dedo->imagen(); ?>
-                                    </div>
-                                </div>
-                            </div>
+                            <?= $buscarCliente->mostrar(); ?>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">

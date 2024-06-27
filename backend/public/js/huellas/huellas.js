@@ -189,6 +189,10 @@ class Dedo {
 
     configurarImagen() {
         this.imagen.addEventListener("click", this.captura.bind(this))
+        this.punterosImagen()
+    }
+
+    punterosImagen() {
         this.imagen.addEventListener("mouseover", () => {
             if (this.listo()) return (this.imagen.style.cursor = "not-allowed")
             this.imagen.style.cursor = "pointer"
@@ -295,6 +299,7 @@ class Dedo {
         this.imagen = imagen
         this.boton = boton
         this.validacion()
+        this.punterosImagen()
     }
 
     modoValidacion() {
@@ -313,6 +318,7 @@ class Dedo {
         this.boton.replaceWith(boton)
         this.imagen = imagen
         this.boton = boton
+        this.punterosImagen()
     }
 
     modoCaptura() {
@@ -370,6 +376,7 @@ class Dedo {
     }
 
     validacion() {
+        this.imagen.querySelector("#fondoHuella").style.fill = "#fff"
         this.lector
             .getLectores()
             .then((lectores) => {

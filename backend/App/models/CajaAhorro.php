@@ -1232,6 +1232,7 @@ class CajaAhorro
             CL_PQS.CDGCL,
             CL_PQS.CDGCO AS SUCURSAL,
             (SELECT NOMBRE FROM CO WHERE CODIGO = CL_PQS.CDGCO) AS NOMBRE_SUCURSAL,
+            (SELECT COUNT(*) FROM HUELLAS WHERE CLIENTE = CL.CODIGO) AS HUELLAS,
             NVL((
                 SELECT
                     SALDO_REAL

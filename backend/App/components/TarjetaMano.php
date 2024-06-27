@@ -4,6 +4,11 @@ namespace App\components;
 
 use App\components\TarjetaDedo;
 
+/**
+ * Clase TarjetaMano
+ * 
+ *  Representa un componente que muestra una tarjeta de mano con dedos para la captura de huellas.
+ */
 class TarjetaMano
 {
     private $mano;
@@ -11,6 +16,12 @@ class TarjetaMano
     private $dedosReqeridos;
     private $ladoBorde;
 
+    /**
+     * Constructor de la clase TarjetaMano.
+     * 
+     * @param string $mano La mano a la que pertenece la tarjeta ('derecha' o 'izquierda').
+     * @param int $dedosReqeridos (Opcional) El número de dedos requeridos en la tarjeta. Por defecto 2.
+     */
     public function __construct($mano, $dedosReqeridos = 2)
     {
         $this->mano = $mano;
@@ -22,6 +33,11 @@ class TarjetaMano
         }
     }
 
+    /**
+     * Método para mostrar la tarjeta de la mano con los dedos a capturar.
+     * 
+     * @return string El código HTML del componente.
+     */
     public function mostrar()
     {
         $dedos = '';

@@ -2,19 +2,36 @@
 
 namespace App\components;
 
+/**
+ * Clase TarjetaDedo
+ * 
+ * Representa un componente que muestra una tarjeta de dedo para la captura de huellas.
+ */
 class TarjetaDedo
 {
     private $dedo;
     private $id;
-    private $modoCaptura;
+    private $modoValidacion;
 
-    public function __construct($mano, $dedo, $modoCaptura = true)
+    /**
+     * Constructor de la clase TarjetaDedo.
+     * 
+     * @param string $mano La mano a la que pertenece el dedo.
+     * @param int $dedo El número del dedo, del 1 al 5.
+     * @param bool $modoValidacion (Opcional) Especifica si la tarjeta no debe mostrar los elementos para el registro inicial. Por defecto true.
+     */
+    public function __construct($mano, $dedo, $modoValidacion = true)
     {
         $this->dedo = $dedo;
         $this->id = $mano . $dedo;
-        $this->modoCaptura = $modoCaptura;
+        $this->modoValidacion = $modoValidacion;
     }
 
+    /**
+     * Método para mostrar la tarjeta de dedo.
+     * 
+     * @return string El código HTML del componente.
+     */
     public function mostrar()
     {
         $estilo = 'style="
@@ -26,7 +43,7 @@ class TarjetaDedo
         justify-content: space-around;
         align-items: center;
         grid-area: dedo;
-        ' . (!$this->modoCaptura ? "height: 200px;" : "height: 300px;") . '
+        ' . (!$this->modoValidacion ? "height: 200px;" : "height: 300px;") . '
         "';
 
         return '<div class="huella-contenedor" id="' . $this->id . '" ' . $estilo . '>' .
@@ -38,9 +55,15 @@ class TarjetaDedo
         ';
     }
 
+    /**
+     * Método para generar el elemento HTML que permite seleccionar el dedo a capturar.
+     * Se muestra solo si el modo de validación está activado.
+     * 
+     * @return string El código HTML del selector.
+     */
     private function dedos()
     {
-        if (!$this->modoCaptura) return '';
+        if (!$this->modoValidacion) return '';
 
         $dedos = [
             1 => 'Pulgar',
@@ -62,6 +85,11 @@ class TarjetaDedo
         ';
     }
 
+    /**
+     * Método para generar el elemento HTML de la imagen de la huella.
+     * 
+     * @return string El código HTML de la imagen de la huella.
+     */
     public function imagen()
     {
         return '
@@ -91,13 +119,26 @@ class TarjetaDedo
         ';
     }
 
+    /**
+     * Método para generar el elemento HTML de la etiqueta que indica el numero de muestras capturadas.
+     * Se muestra solo si el modo de validación está activado.
+     * 
+     * @return string El código HTML de la etiqueta para el dedo.
+     */
+
     private function etiqueta()
     {
-        return !$this->modoCaptura ? '' : '<span id="etiqueta_' . $this->id . '" style="font-size: medium; height: 15px"></span>';
+        return !$this->modoValidacion ? '' : '<span id="etiqueta_' . $this->id . '" style="font-size: medium; height: 15px"></span>';
     }
 
+    /**
+     * Método para generar el elemento HTML del botón para reiniciar la captura de la huella.
+     * Se muestra solo si el modo de validación está activado.
+     * 
+     * @return string El código HTML del botón para limpiar la huella.
+     */
     private function boton()
     {
-        return !$this->modoCaptura ? '' : '<button id="boton_' . $this->id . '" class="btn btn-primary btnHuella">Limpiar</button>';
+        return !$this->modoValidacion ? '' : '<button id="boton_' . $this->id . '" class="btn btn-primary btnHuella">Limpiar</button>';
     }
 }

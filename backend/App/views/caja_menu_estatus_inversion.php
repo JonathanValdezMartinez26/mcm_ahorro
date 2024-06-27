@@ -1,5 +1,13 @@
 <?php echo $header; ?>
 
+<?php
+
+use App\components\BuscarCliente;
+
+$buscarCliente = new BuscarCliente('Para poder dar de alta un nuevo contrato de una cuenta de Ahorro, el cliente debe estar registrado en SICAFIN, si el cliente no tiene una cuenta abierta solicite el alta a su ADMINISTRADORA.');
+
+?>
+
 <div class="right_col">
     <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
         <div class="col-md-3 panel panel-body" style="margin-bottom: 0px;">
@@ -45,13 +53,6 @@
                     <! -- https://cdn-icons-png.flaticon.com/512/942/942752.png -->
                 </div>
             </a>
-            <!--<a id="link" href="/Ahorro/Calculadora/">
-                    <div class="col-md-5" style="margin-top: 20px; margin-left: 0px; border: 1px solid #dfdfdf; border-radius: 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/5833/5833832.png" style="border-radius: 3px; padding-top: 5px;" width="98" height="110">
-                        <p style="font-size: 12px; padding-top: 6px; color: #000000"><b>Calculadora  </b></p>
-
-                    </div>
-                </a>-->
         </div>
         <div class="col-md-9">
             <div class="modal-content">
@@ -73,21 +74,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Para poder dar de alta un nuevo contrato de una cuenta de Ahorro, el cliente debe estar registrado en SICAFIN, si el cliente no tiene una cuenta abierta solicite el alta a su ADMINISTRADORA.</label>
-                                <hr>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="movil">Código de cliente SICAFIN</label>
-                                <input type="text" onkeypress=validarYbuscar(event) class="form-control" id="clienteBuscado" name="clienteBuscado" placeholder="000000" required>
-                            </div>
-                            <div class="col-md-2" style="padding-top: 25px;">
-                                <button id="btnBskClnt" class="btn btn-primary" onclick="buscaCliente()">
-                                    <i class="fa fa-search"></i> Buscar
-                                </button>
-                            </div>
-                        </div>
+                        <?= $buscarCliente->mostrar(); ?>
                         <div class="row">
                             <div class="col-md-8 tile_stats_count">
                                 <div class="form-group">

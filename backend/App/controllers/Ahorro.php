@@ -430,11 +430,100 @@ class Ahorro extends Controller
 
         if (!(horaActual >= horaInicio && horaActual <= horaFin)) showBloqueo("No es posible realizar operaciones fuera del horario establecido (de " + inicio + " a " + fin + ").<br><br><b>Consulte con la gerencia de administración.</b>")
     }';
+    private $showHuella = 'const showHuella = (autorizacion = false, datos =  null) => {
+        Swal.fire({
+            html: `HTML_HUELLA<span id="mensajeHuella" style="height: 50px;"></span>`,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            showCloseButton: true,
+            target: document.getElementById("bloqueoAhorro"),
+            customClass: {
+                container: "sweet-bloqueoAhorro-container",
+                popup: "sweet-bloqueo-mano-popup",
+                htmlContainer: "sweet-bloqueo-mano-htmlContainer",
+            }
+        })
+
+        const lector = new LectorHuellas({
+            notificacion: (mensaje, error = false) => {
+                const huella = document.querySelector("#mensajeHuella")
+                huella.style.color = error ? "red": ""
+                huella.innerText = mensaje
+            }
+        })
+        mano = new Mano("manoIzquierda", lector, document.querySelector(".sweet-bloqueo-mano-htmlContainer"))
+        mano.modoAutorizacion()
+        mano.datosCliente = datos
+        lector.estatus.lecturaOK = "Validando huella.."
+        if (autorizacion) {
+            document.querySelector(".sweet-bloqueo-mano-htmlContainer").addEventListener("validaHuella", autorizaOperacion)
+            lector.estatus.lecturaI = "Autorización del cliente."
+        } else {
+            document.querySelector(".sweet-bloqueo-mano-htmlContainer").addEventListener("validaHuella", validaHuella)
+            lector.estatus.lecturaI = "Identificación del cliente."
+            lector.estatus.lecturaOK = "Validando huella..."
+        }
+    }';
+    private $validaHuella = 'const validaHuella = (e) => {
+        const datos = {
+            muestra: e.detail.muestra
+        }
+    
+        consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
+            e.detail.colorImagen(respuesta.success ? "green" : "red")
+            if (!respuesta.success) {
+                e.detail.conteoErrores()
+                e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
+                return showError(respuesta.mensaje)
+            }
+
+            if (respuesta.cliente) {
+                document.querySelector("#clienteBuscado").value = respuesta.cliente
+                buscaCliente()
+            }
+            Swal.close()
+        })
+    }';
+    private $autorizaOperacion = 'const autorizaOperacion = (e) => {
+        if (e.detail.erroresValidacion >= 5) {
+            showError("Se ha alcanzado el límite de intentos, la operación no se puede completar.")
+            .then(() => {
+                Swal.close()
+                limpiaDatosCliente()
+                return
+            })
+            return
+        }
+
+        const datos = {
+            muestra: e.detail.muestra
+        }
+
+        consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
+            e.detail.colorImagen(respuesta.success ? "green" : "red")
+            if (!respuesta.success) {
+                e.detail.conteoErrores()
+                e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
+                return showError(respuesta.mensaje)
+            }
+
+            Swal.close()
+            if (respuesta.cliente && document.querySelector("#cliente").value !== respuesta.cliente) {
+                showError("La huella corresponde a otro cliente, comuníquese con su administrador.").
+                then(() => {
+                    limpiaDatosCliente()
+                })
+            }
+            showSuccess(respuesta.mensaje).then(() => enviaRegistroOperacion(mano.datosCliente))
+        })
+    }';
 
     function __construct()
     {
         parent::__construct();
         $this->_contenedor = new Contenedor;
+        $tarjetaDedo = new TarjetaDedo("derecha", 1);
+        $this->showHuella = str_replace("HTML_HUELLA", $tarjetaDedo->mostrar(), $this->showHuella);
         View::set('header', $this->_contenedor->header());
         View::set('footer', $this->_contenedor->footer());
     }
@@ -1129,7 +1218,6 @@ class Ahorro extends Controller
         $montoMaximoRetiro = 50000;
         $montoMaximoDeposito = 1000000;
         $maximoRetiroDia = 50000;
-        $tarjetaDedo = new TarjetaDedo("derecha", 1);
 
         $extraFooter = <<<script
         <script>
@@ -1141,7 +1229,7 @@ class Ahorro extends Controller
             let huellas = 0
             let retiroDispobible = maximoRetiroDia
             let mano
-         
+
             {$this->showError}
             {$this->showSuccess}
             {$this->showInfo}
@@ -1164,43 +1252,15 @@ class Ahorro extends Controller
             {$this->showBloqueo}
             {$this->validaHorarioOperacion}
             {$this->valida_MCM_Complementos}
-                      
+            {$this->showHuella}
+            {$this->validaHuella}
+            {$this->autorizaOperacion}
+ 
             window.onload = () => {
                 validaHorarioOperacion("{$_SESSION['inicio']}", "{$_SESSION['fin']}")
                 if(document.querySelector("#clienteBuscado").value !== "") buscaCliente()
             }
-         
-            const showHuella = (autorizacion = false, datos =  null) => {
-                Swal.fire({
-                    html: `<span id="mensajeHuella">Esperando autorización del cliente.</span>{$tarjetaDedo->mostrar()}`,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    showCloseButton: true,
-                    target: document.getElementById("bloqueoAhorro"),
-                    customClass: {
-                        container: "sweet-bloqueoAhorro-container",
-                        popup: "sweet-bloqueoAhorro-popup",
-                        htmlContainer: "sweet-bloqueo-mano",
-                    }
-                })
-        
-                const lector = new LectorHuellas(
-                {
-                    notificacion: (mensaje, error = false) => {
-                        const huella = document.querySelector("#mensajeHuella")
-                        huella.style.color = error ? "red": ""
-                        huella.innerText = mensaje
-                    }
-                })
-                mano = new Mano("manoIzquierda", lector, document.querySelector(".sweet-bloqueo-mano"))
-                mano.modoAutorizacion()
-                mano.datosCliente = datos
-        
-                accion = autorizacion ? autorizaOperacion : validaHuella
-                document.querySelector(".sweet-bloqueo-mano").addEventListener("validaHuella", accion)
-            }
-         
+
             const llenaDatosCliente = (datosCliente) => {
                 retiroDispobible = maximoRetiroDia
                 let blkRetiro = false
@@ -1222,6 +1282,7 @@ class Ahorro extends Controller
             }
              
             const limpiaDatosCliente = () => {
+                huellas = 0
                 document.querySelector("#registroOperacion").reset()
                 document.querySelector("#monto").disabled = true
                 document.querySelector("#btnRegistraOperacion").disabled = true
@@ -1354,9 +1415,7 @@ class Ahorro extends Controller
                     + " (" + document.querySelector("#monto_letra").value + ")?"
                 ).then((continuar) => {
                     if (!continuar) return
-                    if (!document.querySelector("#deposito").checked && huellas > 0) {
-                        return showHuella(true, datos)
-                    }
+                    if (!document.querySelector("#deposito").checked && huellas > 0) return showHuella(true, datos)
                     enviaRegistroOperacion(datos)
                 })
             }
@@ -1371,61 +1430,6 @@ class Ahorro extends Controller
                         imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
                         limpiaDatosCliente()
                     })
-                })
-            }
-         
-            const validaHuella = (e) => {
-                const datos = {
-                    muestra: e.detail.muestra
-                }
-         
-                consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
-                    e.detail.colorImagen(respuesta.success ? "green" : "red")
-                    if (!respuesta.success) {
-                        e.detail.conteoErrores()
-                        e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
-                        return showError(respuesta.mensaje)
-                    }
-                        
-                    if (respuesta.cliente) {
-                        document.querySelector("#clienteBuscado").value = respuesta.cliente
-                        buscaCliente()
-                    }
-                    Swal.close()
-                })
-            }
-
-            const autorizaOperacion = (e) => {
-                if (e.detail.erroresValidacion >= 5) {
-                    showError("Se ha alcanzado el límite de intentos para validar la huella, la operación no se puede completar.")
-                    .then(() => {
-                        Swal.close()
-                        limpiaDatosCliente()
-                        return
-                    })
-                    return
-                }
-
-                const datos = {
-                    muestra: e.detail.muestra
-                }
-         
-                consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
-                    e.detail.colorImagen(respuesta.success ? "green" : "red")
-                    if (!respuesta.success) {
-                        e.detail.conteoErrores()
-                        e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
-                        return showError(respuesta.mensaje)
-                    }
-                    
-                    Swal.close()
-                    if (respuesta.cliente && document.querySelector("#cliente").value !== respuesta.cliente) {
-                        showError("La huella corresponde a otro cliente, comuníquese con su administrador.").
-                        then(() => {
-                            limpiaDatosCliente()
-                        })
-                    }
-                    showSuccess(respuesta.mensaje).then(() => enviaRegistroOperacion(mano.datosCliente))
                 })
             }
         </script>
@@ -1479,6 +1483,7 @@ class Ahorro extends Controller
             const montoMaximoRetiro = $montoMaximoRetiro
             const noSucursal = "{$_SESSION['cdgco_ahorro']}"
             let valKD = false
+            let huellas = 0
          
             {$this->showError}
             {$this->showSuccess}
@@ -1498,6 +1503,9 @@ class Ahorro extends Controller
             {$this->limpiaMontos}
             {$this->consultaServidor}
             {$this->valida_MCM_Complementos}
+            {$this->showHuella}
+            {$this->validaHuella}
+            {$this->autorizaOperacion}
              
             const llenaDatosCliente = (datosCliente) => {
                 if (parseaNumero(datosCliente.SALDO) < montoMinimo) {
@@ -1515,6 +1523,7 @@ class Ahorro extends Controller
                     return
                 }
                  
+                huellas = datosCliente.HUELLAS
                 document.querySelector("#nombre").value = datosCliente.NOMBRE
                 document.querySelector("#curp").value = datosCliente.CURP
                 document.querySelector("#contrato").value = datosCliente.CONTRATO
@@ -1527,6 +1536,7 @@ class Ahorro extends Controller
             }
              
             const limpiaDatosCliente = () => {
+                huellas = 0
                 document.querySelector("#registroOperacion").reset()
                 document.querySelector("#monto").disabled = true
                 document.querySelector("#btnRegistraOperacion").disabled = true
@@ -1644,17 +1654,21 @@ class Ahorro extends Controller
                     + " (" + document.querySelector("#monto_letra").value + ")?"
                 ).then((continuar) => {
                     if (!continuar) return
-                     
-                    consultaServidor("/Ahorro/RegistraSolicitud/", $.param(datos), (respuesta) => {
-                            if (!respuesta.success) {
-                                console.log(respuesta.error)
-                                return showError(respuesta.mensaje)
-                            }
-                            showSuccess(respuesta.mensaje).then(() => {
-                                document.querySelector("#registroOperacion").reset()
-                                limpiaDatosCliente()
-                            })
-                        })
+                    if (huellas > 0) return showHuella(true, datos)
+                    enviaRegistroOperacion(datos)
+                })
+            }
+
+            const enviaRegistroOperacion = (datos) => {
+                consultaServidor("/Ahorro/RegistraSolicitud/", $.param(datos), (respuesta) => {
+                    if (!respuesta.success) {
+                        console.log(respuesta.error)
+                        return showError(respuesta.mensaje)
+                    }
+                    showSuccess(respuesta.mensaje).then(() => {
+                        document.querySelector("#registroOperacion").reset()
+                        limpiaDatosCliente()
+                    })
                 })
             }
         </script>
@@ -1662,7 +1676,7 @@ class Ahorro extends Controller
 
         if ($_GET['cliente']) View::set('cliente', $_GET['cliente']);
 
-        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Solicitud de Retiro")));
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Solicitud de Retiro", [$this->swal2, $this->huellas])));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::set('montoMinimoRetiro', $montoMinimoRetiro);
         View::set('montoMaximoExpress', $montoMaximoExpress);
@@ -1925,6 +1939,8 @@ class Ahorro extends Controller
             const usuario_ahorro = "$usr"
             const noSucursal = "{$_SESSION['cdgco_ahorro']}"
             let tasasDisponibles
+            let huellas = 0
+            let mano
          
             try {
                 tasasDisponibles = JSON.parse('$tasas')
@@ -1956,6 +1972,9 @@ class Ahorro extends Controller
             {$this->showBloqueo}
             {$this->validaHorarioOperacion}
             {$this->valida_MCM_Complementos}
+            {$this->showHuella}
+            {$this->validaHuella}
+            {$this->autorizaOperacion}
          
             window.onload = () => {
                 validaHorarioOperacion("{$_SESSION['inicio']}", "{$_SESSION['fin']}")
@@ -1964,6 +1983,7 @@ class Ahorro extends Controller
             const llenaDatosCliente = (datos) => {
                 const saldoActual = parseaNumero(datos.SALDO)
                          
+                huellas = datos.HUELLAS
                 document.querySelector("#nombre").value = datos.NOMBRE
                 document.querySelector("#curp").value = datos.CURP
                 document.querySelector("#contrato").value = datos.CONTRATO
@@ -1977,6 +1997,7 @@ class Ahorro extends Controller
             }
             
             const limpiaDatosCliente = () => {
+                huellas = 0
                 document.querySelector("#registroOperacion").reset()
                 document.querySelector("#monto").disabled = true
                 document.querySelector("#btnRegistraOperacion").disabled = true
@@ -2102,18 +2123,22 @@ class Ahorro extends Controller
                     + " a un plazo de " + plazo.options[plazo.selectedIndex].text + "?"
                 ).then((continuar) => {
                     if (!continuar) return
-                 
-                    consultaServidor("/Ahorro/RegistraInversion/", $.param(datos), (respuesta) => {
-                            if (!respuesta.success){
-                                console.log(respuesta.error)
-                                return showError(respuesta.mensaje)
-                            }
-                            showSuccess(respuesta.mensaje).then(() => {
-                                imprimeContrato(respuesta.datos.codigo, 2)
-                                imprimeTicket(respuesta.datos.ticket, sucursal_ahorro)
-                                limpiaDatosCliente()
-                            })
-                        })
+                    if (huellas > 0) return showHuella(true, datos)
+                    enviaRegistroOperacion(datos)
+                })
+            }
+
+            const enviaRegistroOperacion = (datos) => {
+                consultaServidor("/Ahorro/RegistraInversion/", $.param(datos), (respuesta) => {
+                    if (!respuesta.success){
+                        console.log(respuesta.error)
+                        return showError(respuesta.mensaje)
+                    }
+                    showSuccess(respuesta.mensaje).then(() => {
+                        imprimeContrato(respuesta.datos.codigo, 2)
+                        imprimeTicket(respuesta.datos.ticket, sucursal_ahorro)
+                        limpiaDatosCliente()
+                    })
                 })
             }
              
@@ -2142,7 +2167,7 @@ class Ahorro extends Controller
         }
         $opcEjecutivos .= "<option value='{$this->__usuario}'>{$this->__nombre} - CAJER(A)</option>";
 
-        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Contrato Inversión", [$this->swal2])));
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Contrato Inversión", [$this->swal2, $this->huellas])));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::set('fecha', date('d/m/Y H:i:s'));
         view::set('ejecutivos', $opcEjecutivos);
@@ -2172,6 +2197,8 @@ class Ahorro extends Controller
             {$this->primeraMayuscula}
             {$this->consultaServidor}
             {$this->configuraTabla}
+            {$this->showHuella}
+            {$this->validaHuella}
              
             $(document).ready(configuraTabla("muestra-cupones"))
              
@@ -2231,7 +2258,7 @@ class Ahorro extends Controller
         </script>
         html;
 
-        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Consulta Inversiones")));
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Consulta Inversiones", [$this->swal2, $this->huellas])));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::render("caja_menu_estatus_inversion");
     }
@@ -2268,6 +2295,8 @@ class Ahorro extends Controller
             {$this->imprimeContrato}
             {$this->addParametro}
             {$this->consultaServidor}
+            {$this->showHuella}
+            {$this->validaHuella}
              
             const buscaCliente = () => {
                 const noCliente = document.querySelector("#clienteBuscado")
@@ -2532,7 +2561,6 @@ class Ahorro extends Controller
         </script>
         html;
 
-
         $ComboEntidades = CajaAhorroDao::GetEFed();
 
         $opciones_ent = "";
@@ -2543,7 +2571,7 @@ class Ahorro extends Controller
         }
 
         if ($_GET['cliente']) View::set('cliente', $_GET['cliente']);
-        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Contrato Cuenta Peque")));
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Contrato Cuenta Peque", [$this->swal2, $this->huellas])));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::set('fecha', date('Y-m-d'));
         View::set('opciones_ent', $opciones_ent);
@@ -2588,6 +2616,8 @@ class Ahorro extends Controller
             let retiroDispobible = maximoRetiroDia
             let retiroBloqueado = false
             let valKD = false
+            let huellas = 0
+            let mano
          
             {$this->showError}
             {$this->showSuccess}
@@ -2609,6 +2639,9 @@ class Ahorro extends Controller
             {$this->showBloqueo}
             {$this->validaHorarioOperacion}
             {$this->valida_MCM_Complementos}
+            {$this->showHuella}
+            {$this->validaHuella}
+            {$this->autorizaOperacion}
          
             window.onload = () => {
                 validaHorarioOperacion("{$_SESSION['inicio']}", "{$_SESSION['fin']}")
@@ -2685,6 +2718,7 @@ class Ahorro extends Controller
                         opcion.value = cliente.CDG_CONTRATO
                         opcion.innerText = cliente.NOMBRE
                         contratos.appendChild(opcion)
+                        huellas = cliente.HUELLAS
                     })
                         
                     document.querySelector("#contrato").appendChild(contratos)
@@ -2734,6 +2768,7 @@ class Ahorro extends Controller
             }
              
             const limpiaDatosCliente = () => {
+                huellas = 0
                 document.querySelector("#registroOperacion").reset()
                 document.querySelector("#fecha_pago").value = getHoy()
                 document.querySelector("#monto").disabled = true
@@ -2879,18 +2914,21 @@ class Ahorro extends Controller
                     + " (" + document.querySelector("#monto_letra").value + ")?"
                 ).then((continuar) => {
                     if (!continuar) return
-                    
-                    consultaServidor("/Ahorro/registraOperacion/", $.param(datos), (respuesta) => {
-                            if (!respuesta.success){
-                                if (respuesta.error) return showError(respuesta.error)
-                                return showError(respuesta.mensaje)
-                            }
-                            
-                            showSuccess(respuesta.mensaje).then(() => {
-                                imprimeTicket(respuesta.datos.ticket, noSucursal)
-                                limpiaDatosCliente()
-                            })
-                        })
+                    if (!document.querySelector("#deposito").checked && huellas > 0) return showHuella(true, datos)
+                    enviaRegistroOperacion(datos)
+                })
+            }
+
+            const enviaRegistroOperacion = (datos) => {
+                consultaServidor("/Ahorro/registraOperacion/", $.param(datos), (respuesta) => {
+                    if (!respuesta.success){
+                        if (respuesta.error) return showError(respuesta.error)
+                        return showError(respuesta.mensaje)
+                    }
+                    showSuccess(respuesta.mensaje).then(() => {
+                        imprimeTicket(respuesta.datos.ticket, noSucursal)
+                        limpiaDatosCliente()
+                    })
                 })
             }
         </script>
@@ -2899,7 +2937,7 @@ class Ahorro extends Controller
         if ($_GET['cliente']) View::set('cliente', $_GET['cliente']);
         if ($_GET['contrato']) View::set('contratoSel', $_GET['contrato']);
 
-        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Cuenta Peque", [$this->swal2])));
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Cuenta Peque", [$this->swal2, $this->huellas])));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::set('fecha', date('d/m/Y H:i:s'));
         View::render("caja_menu_peque");
@@ -2922,6 +2960,8 @@ class Ahorro extends Controller
             const montoMaximoExpress = $montoMaximoExpress
             const montoMaximoRetiro = $montoMaximoRetiro
             let valKD = false
+            let huellas = 0
+            let mano
          
             {$this->showError}
             {$this->showSuccess}
@@ -2939,6 +2979,9 @@ class Ahorro extends Controller
             {$this->formatoMoneda}
             {$this->limpiaMontos}
             {$this->consultaServidor}
+            {$this->showHuella}
+            {$this->validaHuella}
+            {$this->autorizaOperacion}
              
             const buscaCliente = () => {
                 const noCliente = document.querySelector("#clienteBuscado").value
@@ -3005,6 +3048,7 @@ class Ahorro extends Controller
                     contratos.appendChild(seleccionar)
                         
                     datosCliente.forEach(cliente => {
+                        hue = cliente.HUELLAS
                         const opcion = document.createElement("option")
                         opcion.value = cliente.CDG_CONTRATO
                         opcion.innerText = cliente.NOMBRE
@@ -3051,6 +3095,7 @@ class Ahorro extends Controller
             }
              
             const limpiaDatosCliente = () => {
+                huellas = 0
                 document.querySelector("#registroOperacion").reset()
                 document.querySelector("#fecha_retiro").value = getHoy()
                 document.querySelector("#monto").disabled = true
@@ -3169,17 +3214,21 @@ class Ahorro extends Controller
                     + " (" + document.querySelector("#monto_letra").value + ")?"
                 ).then((continuar) => {
                     if (!continuar) return
-                    
-                    consultaServidor("/Ahorro/RegistraSolicitud/", $.param(datos), (respuesta) => {
-                            if (!respuesta.success) {
-                                console.log(respuesta.error)
-                                return showError(respuesta.mensaje)
-                            }
-                            showSuccess(respuesta.mensaje).then(() => {
-                                document.querySelector("#registroOperacion").reset()
-                                limpiaDatosCliente()
-                            })
-                        })
+                    if (huellas > 0) return showHuella(true, datos)
+                    enviaRegistroOperacion(datos)
+                })
+            }
+
+            const enviaRegistroOperacion = (datos) => {
+                consultaServidor("/Ahorro/RegistraSolicitud/", $.param(datos), (respuesta) => {
+                    if (!respuesta.success) {
+                        console.log(respuesta.error)
+                        return showError(respuesta.mensaje)
+                    }
+                    showSuccess(respuesta.mensaje).then(() => {
+                        document.querySelector("#registroOperacion").reset()
+                        limpiaDatosCliente()
+                    })
                 })
             }
         </script>
@@ -3194,7 +3243,7 @@ class Ahorro extends Controller
         if ($_GET['cliente']) View::set('cliente', $_GET['cliente']);
         if ($_GET['contrato']) View::set('contratoSel', $_GET['contrato']);
 
-        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Solicitud de Retiro Peque")));
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader("Solicitud de Retiro Peque", [$this->swal2, $this->huellas])));
         View::set('footer', $this->_contenedor->footer($extraFooter));
         View::set('montoMinimoRetiro', $montoMinimoRetiro);
         View::set('montoMaximoExpress', $montoMaximoExpress);
