@@ -1390,7 +1390,7 @@ class Ahorro extends Controller
             }
              
             const registraOperacion = async (e) => {
-                //if (!await valida_MCM_Complementos()) return
+                if (!await valida_MCM_Complementos()) return
                  
                 e.preventDefault()
                 const datos = $("#registroOperacion").serializeArray()
