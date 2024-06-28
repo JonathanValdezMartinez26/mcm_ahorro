@@ -817,7 +817,7 @@ class Ahorro extends Controller
                         showSuccess("Se ha generado el contrato: " + contrato + ".")
                         .then(() => {
                             imprimeContrato(contrato, 1)
-                            //imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
+                            imprimeTicket(respuesta.datos.ticket, "{$_SESSION['cdgco_ahorro']}")
                         })
                     })
                 })
