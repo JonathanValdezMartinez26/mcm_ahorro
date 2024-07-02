@@ -415,9 +415,10 @@ class Ahorro extends Controller
             document.getElementById(idI).value = fechaF
         }
     }';
-    private $validaHorarioOperacion = 'const validaHorarioOperacion = (inicio, fin, sinMsj = false) => {
-        // inicio = "01:00:00"    
-        // fin = "24:00:00"
+    private $validaHorarioOperacion = <<<script
+        const validaHorarioOperacion = (inicio, fin, sinMsj = false) => {
+        if ({$_SESSION['perfil']} == 'ADMIN' || {$_SESSION['usuario']} == 'AMGM')
+
         const horaActual = new Date()
         const horaInicio = new Date()
         const horaFin = new Date()
@@ -429,7 +430,8 @@ class Ahorro extends Controller
         if (sinMsj) return horaActual >= horaInicio && horaActual <= horaFin
 
         if (!(horaActual >= horaInicio && horaActual <= horaFin)) showBloqueo("No es posible realizar operaciones fuera del horario establecido (de " + inicio + " a " + fin + ").<br><br><b>Consulte con la gerencia de administración.</b>")
-    }';
+    }
+    script;
     private $showHuella = 'const showHuella = (autorizacion = false, datos =  null) => {
         Swal.fire({
             html: `HTML_HUELLA<span id="mensajeHuella" style="height: 50px;"></span>`,
@@ -3916,6 +3918,7 @@ class Ahorro extends Controller
     // Generación de ticket's de operaciones realizadas
     public function ValidaHorario()
     {
+        if ($_SESSION['perfil'] == 'ADMIN' || $_SESSION['usuario'] == 'AMGM') return true;
         $ahora = new DateTime();
         $inicio = DateTime::createFromFormat('H:i:s', $_SESSION['inicio']);
         $fin = DateTime::createFromFormat('H:i:s', $_SESSION['fin']); // "19:00:00"); //

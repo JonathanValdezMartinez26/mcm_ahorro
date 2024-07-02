@@ -25,225 +25,225 @@ class ApiCondusef extends Controller
         $fecha = date('Y-m-d');
 
         $extraFooter = <<<html
-            <script>                                                  
-                const showError = (mensaje) => swal(mensaje, { icon: "error" })
-                const showAviso = (mensaje) => swal(mensaje, { icon: "warning" })
-                const showSuccess = (mensaje) => swal(mensaje, { icon: "success" , showConfirmButton: true,}).then((result) => {location.reload();} )
+        <script>                                                  
+            const showError = (mensaje) => swal(mensaje, { icon: "error" })
+            const showAviso = (mensaje) => swal(mensaje, { icon: "warning" })
+            const showSuccess = (mensaje) => swal(mensaje, { icon: "success" , showConfirmButton: true,}).then((result) => {location.reload();} )
+        
+            const consumeAPI = (url, callback, datos = null, tipoDatos = 'json', tipo = "get", token = null, msgError = "", fncERR = null) => {
+                $.ajax({
+                    type: tipo,
+                    url: url,
+                    dataType: tipoDatos,
+                    data: JSON.stringify(datos),
+                    contentType: "application/json",
+                    success: callback,
+                    error: (resError) => {
+                        console.log(resError.responseJSON)
+                        if (fncERR) fncERR(resError.responseJSON)
+                        else showError(msgError)
+                    },
+                    headers: { "Authorization": token }
+                })
+            }
             
-                const consumeAPI = (url, callback, datos = null, tipoDatos = 'json', tipo = "get", token = null, msgError = "", fncERR = null) => {
-                    $.ajax({
-                        type: tipo,
-                        url: url,
-                        dataType: tipoDatos,
-                        data: JSON.stringify(datos),
-                        contentType: "application/json",
-                        success: callback,
-                        error: (resError) => {
-                            console.log(resError.responseJSON)
-                            if (fncERR) fncERR(resError.responseJSON)
-                            else showError(msgError)
-                        },
-                        headers: { "Authorization": token }
-                    })
+            const limpiaCampos = (mensaje = "") => {
+                if (mensaje !== "") showError(mensaje)
+                document.querySelector("#QuejasEstados").innerHTML = ""
+                document.querySelector("#QuejasEstados").disabled = true
+                document.querySelector("#QuejasMunId").innerHTML = ""
+                document.querySelector("#QuejasMunId").disabled = true
+                document.querySelector("#QuejasLocId").innerHTML = ""
+                document.querySelector("#QuejasLocId").disabled = true
+                document.querySelector("#QuejasColId").innerHTML = ""
+                document.querySelector("#QuejasColId").disabled = true
+            }
+            
+            const soloNumeros = (e) => {
+                if (e.keyCode < 48 || e.keyCode > 57) return e.preventDefault()
+            }
+            
+            const validaLargo = (e, largo = 1) => {
+                if (e.target.value.length > largo) return e.preventDefault()
+            }
+            
+            const validaEntradaCP = (e) =>{
+                if (e.keyCode === 13) {
+                    validaCP()
+                    return e.preventDefault()
                 }
-                 
-                const limpiaCampos = (mensaje = "") => {
-                    if (mensaje !== "") showError(mensaje)
-                    document.querySelector("#QuejasEstados").innerHTML = ""
-                    document.querySelector("#QuejasEstados").disabled = true
-                    document.querySelector("#QuejasMunId").innerHTML = ""
-                    document.querySelector("#QuejasMunId").disabled = true
-                    document.querySelector("#QuejasLocId").innerHTML = ""
-                    document.querySelector("#QuejasLocId").disabled = true
-                    document.querySelector("#QuejasColId").innerHTML = ""
-                    document.querySelector("#QuejasColId").disabled = true
+                if (e.keyCode < 48 || e.keyCode > 57) return e.preventDefault()
+            }
+    
+            const validaEdad = (e) => {
+                if (e.target.value < 18) {
+                    return showAviso("La edad mínima para registrar una queja es de 18 años.")
+                    .then(() => e.target.focus())
                 }
-                 
-                const soloNumeros = (e) => {
-                    if (e.keyCode < 48 || e.keyCode > 57) return e.preventDefault()
+            }
+            
+            const formatoFecha = (fecha) => {
+                const [anio, mes, dia] = fecha.split("-")
+                return dia + "/" + mes + "/" + anio
+            }
+            
+            const validaFechaRecepcion = () => {
+                const fechaRegistro = document.querySelector("#QuejasFecRecepcion").value
+                const mesRegistro = document.querySelector("#QuejasNoMes").value
+                const [anio, mes, dia] = fechaRegistro.split("-")
+                
+                if (parseInt(mes) != parseInt(mesRegistro)) {
+                    document.querySelector("#QuejasFecRecepcion").value = "$fecha"
+                    return showAviso("El mes de registro no coincide con la fecha de recepción, favor de validar.")
                 }
-                 
-                const validaLargo = (e, largo = 1) => {
-                    if (e.target.value.length > largo) return e.preventDefault()
-                }
-                 
-                const validaEntradaCP = (e) =>{
-                    if (e.keyCode === 13) {
-                        validaCP()
-                        return e.preventDefault()
-                    }
-                    if (e.keyCode < 48 || e.keyCode > 57) return e.preventDefault()
-                }
-         
-                const validaEdad = (e) => {
-                    if (e.target.value < 18) {
-                        return showAviso("La edad mínima para registrar una queja es de 18 años.")
-                        .then(() => e.target.focus())
-                    }
-                }
-                 
-                const formatoFecha = (fecha) => {
-                    const [anio, mes, dia] = fecha.split("-")
-                    return dia + "/" + mes + "/" + anio
-                }
-                 
-                const validaFechaRecepcion = () => {
-                    const fechaRegistro = document.querySelector("#QuejasFecRecepcion").value
-                    const mesRegistro = document.querySelector("#QuejasNoMes").value
-                    const [anio, mes, dia] = fechaRegistro.split("-")
-                     
-                    if (parseInt(mes) != parseInt(mesRegistro)) {
-                        document.querySelector("#QuejasFecRecepcion").value = "$fecha"
-                        return showAviso("El mes de registro no coincide con la fecha de recepción, favor de validar.")
-                    }
-                }
-                 
-                const validaCP = () => {
-                    const cp = document.querySelector("#QuejasCP").value
-                    if (cp.length !== 5) return limpiaCampos("El código postal debe ser de 5 dígitos.")
+            }
+            
+            const validaCP = () => {
+                const cp = document.querySelector("#QuejasCP").value
+                if (cp.length !== 5) return limpiaCampos("El código postal debe ser de 5 dígitos.")
+                
+                const url = "https://api.condusef.gob.mx/sepomex/colonias/?cp=" + cp
+                
+                consumeAPI(url, (data) => {
+                    if (data.colonias.length === 0) return limpiaCampos("Código postal no encontrado.")
                     
-                    const url = "https://api.condusef.gob.mx/sepomex/colonias/?cp=" + cp
-                    
-                    consumeAPI(url, (data) => {
-                        if (data.colonias.length === 0) return limpiaCampos("Código postal no encontrado.")
-                        
-                        validaEstado(data.colonias)
-                        validaMunicipio(data.colonias)
-                        validaLocalidad(data.colonias)
-                        validaColonia(data.colonias)
-                    })
-                }
-                 
-                const validaEstado = (edo) => {
-                    const estado = document.querySelector("#QuejasEstados")
-                    const estados = getOpciones(edo, "estadoId", "estado")
-                    insertaOpciones(estado, estados)
-                }
-                 
-                const validaMunicipio = (mun) => {
-                    const municipio = document.querySelector("#QuejasMunId")
-                    const municipios = getOpciones(mun, "municipioId", "municipio")
-                    insertaOpciones(municipio, municipios)
-                }
-                 
-                const validaLocalidad = (loc) => {
-                    const localidad = document.querySelector("#QuejasLocId")
-                    const localidades = getOpciones(loc, "tipoLocalidadId", "tipoLocalidad")
-                    insertaOpciones(localidad, localidades)
-                }
-                 
-                const validaColonia = (col) => {
-                    const colonia = document.querySelector("#QuejasColId")
-                    const colonias = getOpciones(col, "coloniaId", "colonia")
-                    insertaOpciones(colonia, colonias)
-                }
-                 
-                const getOpciones = (elementos, key, value) => {
-                    const opciones = []
-                    elementos.forEach(elemento => {
-                        const opcion = "<option value='" + elemento[key] + "'>" + elemento[value] + "</option>"
-                        if (!opciones.includes(opcion)) opciones.push(opcion)
-                    })
-                    return opciones
-                }
-                 
-                const insertaOpciones = (elemento, opciones = []) => {
-                    if (opciones.length > 1) opciones.unshift("<option value='' disabled>Seleccione</option>")
-                    
-                    elemento.innerHTML = opciones.join("")
-                    elemento.selectedIndex = 0
-                    elemento.disabled = !(opciones.length > 1)
-                }
-         
-                const validaRequeridos = () => {
-                    const requeridos = [
-                        "#QuejasNoMes",
-                        "#QuejasNum",
-                        "#QuejasFolio",
-                        "#QuejasFecRecepcion",
-                        "#QuejasMedio",
-                        "#QuejasNivelAT",
-                        "#QuejasProducto",
-                        "#QuejasCausa",
-                        "#QuejasPORI",
-                        "#QuejasEstatus",
-                        "#QuejasCP",
-                        "#QuejasEstados",
-                        "#QuejasMunId",
-                        "#QuejasLocId",
-                        "#QuejasColId",
-                        "#QuejasTipoPersona",
-                        "#QuejasSexo",
-                        "#QuejasEdad",
-                        "#QuejasFecNotificacion",
-                        "#QuejasNumPenal",
-                        "#QuejasPenalizacion"
-                    ]
+                    validaEstado(data.colonias)
+                    validaMunicipio(data.colonias)
+                    validaLocalidad(data.colonias)
+                    validaColonia(data.colonias)
+                })
+            }
+            
+            const validaEstado = (edo) => {
+                const estado = document.querySelector("#QuejasEstados")
+                const estados = getOpciones(edo, "estadoId", "estado")
+                insertaOpciones(estado, estados)
+            }
+            
+            const validaMunicipio = (mun) => {
+                const municipio = document.querySelector("#QuejasMunId")
+                const municipios = getOpciones(mun, "municipioId", "municipio")
+                insertaOpciones(municipio, municipios)
+            }
+            
+            const validaLocalidad = (loc) => {
+                const localidad = document.querySelector("#QuejasLocId")
+                const localidades = getOpciones(loc, "tipoLocalidadId", "tipoLocalidad")
+                insertaOpciones(localidad, localidades)
+            }
+            
+            const validaColonia = (col) => {
+                const colonia = document.querySelector("#QuejasColId")
+                const colonias = getOpciones(col, "coloniaId", "colonia")
+                insertaOpciones(colonia, colonias)
+            }
+            
+            const getOpciones = (elementos, key, value) => {
+                const opciones = []
+                elementos.forEach(elemento => {
+                    const opcion = "<option value='" + elemento[key] + "'>" + elemento[value] + "</option>"
+                    if (!opciones.includes(opcion)) opciones.push(opcion)
+                })
+                return opciones
+            }
+            
+            const insertaOpciones = (elemento, opciones = []) => {
+                if (opciones.length > 1) opciones.unshift("<option value='' disabled>Seleccione</option>")
                 
-                    const elementos = document.querySelectorAll(requeridos.join(","))
-                    let validacion = false
-                
-                    elementos.forEach((elemento) => {
-                        if (elemento.value === "" || elemento.value === "Seleccione") {
-                            validacion = true
-                        }
-         
-                        if (elemento.id === "QuejasEdad" && Number(elemento.value) < 18) {
-                            validacion = false
-                        }
-                    })
-                
-                    document.querySelector("#btnAgregar").disabled = validacion
-                }
-                
-                const registrarQueja =(e) => {
-                    e.preventDefault()
-                    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkYmE0MWMyZi1kNzBkLTQ4NmUtYjA0Yi0zZWYxMDc3YTNmNDciLCJ1c2VybmFtZSI6InN5c3RlbU1DTSIsImluc3RpdHVjaW9uaWQiOiJGOUNGMjUzMy03RjRDLTQ3RkYtOTIyNi04MEE4QjA3OCIsImluc3RpdHVjaW9uQ2xhdmUiOjE1NDk0LCJkZW5vbWluYWNpb25fc29jaWFsIjoiRmluYW5jaWVyYSBDdWx0aXZhLCBTLkEuUC5JLiBkZSBDLlYuLCBTT0ZPTSwgRS5OLlIuIiwic2VjdG9yaWQiOjI0LCJzZWN0b3IiOiJTT0NJRURBREVTIEZJTkFOQ0lFUkFTIERFIE9CSkVUTyBNVUxUSVBMRSBFTlIiLCJzeXN0ZW0iOiJSRURFQ08iLCJpYXQiOjE3MTgxNDM2OTcsImV4cCI6MTcyMDczNTY5N30._5nqkX_PuvsWNF6RhNKSi885EEKOi7lSPC4FwcBOObk"
-         
-                    const datos = [{
-                        "QuejasDenominacion": document.querySelector("#QuejasDenominacion").value,
-                        "QuejasSector": document.querySelector("#QuejasSector").value,
-                        "QuejasNoMes": Number(document.querySelector("#QuejasNoMes").value),
-                        "QuejasNum": Number(document.querySelector("#QuejasNum").value),
-                        "QuejasFolio": document.querySelector("#QuejasFolio").value,
-                        "QuejasFecRecepcion": formatoFecha(document.querySelector("#QuejasFecRecepcion").value),
-                        "QuejasMedio": Number(document.querySelector("#QuejasMedio").value),
-                        "QuejasNivelAT": Number(document.querySelector("#QuejasNivelAT").value),
-                        "QuejasProducto": document.querySelector("#QuejasProducto").value,
-                        "QuejasCausa": document.querySelector("#QuejasCausa").value,
-                        "QuejasPORI": document.querySelector("#QuejasPORI").value,
-                        "QuejasEstatus": Number(document.querySelector("#QuejasEstatus").value),
-                        "QuejasEstados": Number(document.querySelector("#QuejasEstados").value),
-                        "QuejasMunId": Number(document.querySelector("#QuejasMunId").value),
-                        "QuejasLocId": Number(document.querySelector("#QuejasLocId").value),
-                        "QuejasColId": Number(document.querySelector("#QuejasColId").value),
-                        "QuejasCP": Number(document.querySelector("#QuejasCP").value),
-                        "QuejasTipoPersona": Number(document.querySelector("#QuejasTipoPersona").value),
-                        "QuejasSexo": document.querySelector("#QuejasSexo").value,
-                        "QuejasEdad": Number(document.querySelector("#QuejasEdad").value),
-                        "QuejasFecResolucion": null,
-                        "QuejasFecNotificacion": null, //formatoFecha(document.querySelector("#QuejasFecNotificacion").value),
-                        "QuejasRespuesta": null,
-                        "QuejasNumPenal": Number(document.querySelector("#QuejasNumPenal").value),
-                        "QuejasPenalizacion": Number(document.querySelector("#QuejasPenalizacion").value),
-                    }]
-                     
-                    const procesaRespuesta = (respuesta) => {
-                        return showSuccess("Queja registrada exitosamente con el folio: " + document.querySelector("#QuejasFolio").value)
+                elemento.innerHTML = opciones.join("")
+                elemento.selectedIndex = 0
+                elemento.disabled = !(opciones.length > 1)
+            }
+    
+            const validaRequeridos = () => {
+                const requeridos = [
+                    "#QuejasNoMes",
+                    "#QuejasNum",
+                    "#QuejasFolio",
+                    "#QuejasFecRecepcion",
+                    "#QuejasMedio",
+                    "#QuejasNivelAT",
+                    "#QuejasProducto",
+                    "#QuejasCausa",
+                    "#QuejasPORI",
+                    "#QuejasEstatus",
+                    "#QuejasCP",
+                    "#QuejasEstados",
+                    "#QuejasMunId",
+                    "#QuejasLocId",
+                    "#QuejasColId",
+                    "#QuejasTipoPersona",
+                    "#QuejasSexo",
+                    "#QuejasEdad",
+                    "#QuejasFecNotificacion",
+                    "#QuejasNumPenal",
+                    "#QuejasPenalizacion"
+                ]
+            
+                const elementos = document.querySelectorAll(requeridos.join(","))
+                let validacion = false
+            
+                elementos.forEach((elemento) => {
+                    if (elemento.value === "" || elemento.value === "Seleccione") {
+                        validacion = true
                     }
+    
+                    if (elemento.id === "QuejasEdad" && Number(elemento.value) < 18) {
+                        validacion = false
+                    }
+                })
+            
+                document.querySelector("#btnAgregar").disabled = validacion
+            }
+            
+            const registrarQueja =(e) => {
+                e.preventDefault()
+                const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkYmE0MWMyZi1kNzBkLTQ4NmUtYjA0Yi0zZWYxMDc3YTNmNDciLCJ1c2VybmFtZSI6InN5c3RlbU1DTSIsImluc3RpdHVjaW9uaWQiOiJGOUNGMjUzMy03RjRDLTQ3RkYtOTIyNi04MEE4QjA3OCIsImluc3RpdHVjaW9uQ2xhdmUiOjE1NDk0LCJkZW5vbWluYWNpb25fc29jaWFsIjoiRmluYW5jaWVyYSBDdWx0aXZhLCBTLkEuUC5JLiBkZSBDLlYuLCBTT0ZPTSwgRS5OLlIuIiwic2VjdG9yaWQiOjI0LCJzZWN0b3IiOiJTT0NJRURBREVTIEZJTkFOQ0lFUkFTIERFIE9CSkVUTyBNVUxUSVBMRSBFTlIiLCJzeXN0ZW0iOiJSRURFQ08iLCJpYXQiOjE3MTgxNDM2OTcsImV4cCI6MTcyMDczNTY5N30._5nqkX_PuvsWNF6RhNKSi885EEKOi7lSPC4FwcBOObk"
+    
+                const datos = [{
+                    "QuejasDenominacion": document.querySelector("#QuejasDenominacion").value,
+                    "QuejasSector": document.querySelector("#QuejasSector").value,
+                    "QuejasNoMes": Number(document.querySelector("#QuejasNoMes").value),
+                    "QuejasNum": Number(document.querySelector("#QuejasNum").value),
+                    "QuejasFolio": document.querySelector("#QuejasFolio").value,
+                    "QuejasFecRecepcion": formatoFecha(document.querySelector("#QuejasFecRecepcion").value),
+                    "QuejasMedio": Number(document.querySelector("#QuejasMedio").value),
+                    "QuejasNivelAT": Number(document.querySelector("#QuejasNivelAT").value),
+                    "QuejasProducto": document.querySelector("#QuejasProducto").value,
+                    "QuejasCausa": document.querySelector("#QuejasCausa").value,
+                    "QuejasPORI": document.querySelector("#QuejasPORI").value,
+                    "QuejasEstatus": Number(document.querySelector("#QuejasEstatus").value),
+                    "QuejasEstados": Number(document.querySelector("#QuejasEstados").value),
+                    "QuejasMunId": Number(document.querySelector("#QuejasMunId").value),
+                    "QuejasLocId": Number(document.querySelector("#QuejasLocId").value),
+                    "QuejasColId": Number(document.querySelector("#QuejasColId").value),
+                    "QuejasCP": Number(document.querySelector("#QuejasCP").value),
+                    "QuejasTipoPersona": Number(document.querySelector("#QuejasTipoPersona").value),
+                    "QuejasSexo": document.querySelector("#QuejasSexo").value,
+                    "QuejasEdad": Number(document.querySelector("#QuejasEdad").value),
+                    "QuejasFecResolucion": null,
+                    "QuejasFecNotificacion": null, //formatoFecha(document.querySelector("#QuejasFecNotificacion").value),
+                    "QuejasRespuesta": null,
+                    "QuejasNumPenal": Number(document.querySelector("#QuejasNumPenal").value),
+                    "QuejasPenalizacion": Number(document.querySelector("#QuejasPenalizacion").value),
+                }]
+                
+                const procesaRespuesta = (respuesta) => {
+                    return showSuccess("Queja registrada exitosamente con el folio: " + document.querySelector("#QuejasFolio").value)
+                }
 
-                    const procesaError = (respuesta) => {
-                        let mensaje = "Ocurrieron los siguientes errores:\\n\\n"
-                        respuesta.errors[datos[0].QuejasFolio].forEach((error, i) => {
-                            mensaje += (i+1) + ".-" + error + "\\n" 
-                        })
-                        mensaje += "\\n" + respuesta.message
-                        return showError(mensaje)
-                    }
-                            
-                    consumeAPI("https://api.condusef.gob.mx/redeco/quejas", procesaRespuesta, datos, "json", "post", token, "Ocurrió un error de comunicación con el portal de REDECO.", procesaError)
+                const procesaError = (respuesta) => {
+                    let mensaje = "Ocurrieron los siguientes errores:\\n\\n"
+                    respuesta.errors[datos[0].QuejasFolio].forEach((error, i) => {
+                        mensaje += (i+1) + ".-" + error + "\\n" 
+                    })
+                    mensaje += "\\n" + respuesta.message
+                    return showError(mensaje)
                 }
-            </script>
+                        
+                consumeAPI("https://api.condusef.gob.mx/redeco/quejas", procesaRespuesta, datos, "json", "post", token, "Ocurrió un error de comunicación con el portal de REDECO.", procesaError)
+            }
+        </script>
         html;
 
         $meses = [
