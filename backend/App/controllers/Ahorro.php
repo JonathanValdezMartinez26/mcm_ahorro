@@ -415,9 +415,8 @@ class Ahorro extends Controller
             document.getElementById(idI).value = fechaF
         }
     }';
-    private $validaHorarioOperacion = <<<script
-        const validaHorarioOperacion = (inicio, fin, sinMsj = false) => {
-        if ({$_SESSION['perfil']} == 'ADMIN' || {$_SESSION['usuario']} == 'AMGM')
+    private $validaHorarioOperacion = 'const validaHorarioOperacion = (inicio, fin, sinMsj = false) => {
+        if ("__PERFIL__" === "ADMIN" || "__USUARIO__" === "AMGM") return
 
         const horaActual = new Date()
         const horaInicio = new Date()
@@ -430,8 +429,7 @@ class Ahorro extends Controller
         if (sinMsj) return horaActual >= horaInicio && horaActual <= horaFin
 
         if (!(horaActual >= horaInicio && horaActual <= horaFin)) showBloqueo("No es posible realizar operaciones fuera del horario establecido (de " + inicio + " a " + fin + ").<br><br><b>Consulte con la gerencia de administración.</b>")
-    }
-    script;
+    }';
     private $showHuella = 'const showHuella = (autorizacion = false, datos =  null) => {
         Swal.fire({
             html: `HTML_HUELLA<span id="mensajeHuella" style="height: 50px;"></span>`,
@@ -526,6 +524,8 @@ class Ahorro extends Controller
         $this->_contenedor = new Contenedor;
         $tarjetaDedo = new TarjetaDedo("derecha", 1);
         $this->showHuella = str_replace("HTML_HUELLA", $tarjetaDedo->mostrar(), $this->showHuella);
+        $this->validaHorarioOperacion = str_replace("__PERFIL__", $_SESSION['perfil'], $this->validaHorarioOperacion);
+        $this->validaHorarioOperacion = str_replace("__USUARIO__", $_SESSION['usuario'], $this->validaHorarioOperacion);
         View::set('header', $this->_contenedor->header());
         View::set('footer', $this->_contenedor->footer());
     }
