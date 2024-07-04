@@ -3193,6 +3193,8 @@ sql;
 
     public static function GetHuellas($datos)
     {
+        $d = $datos["dedo"] ? $datos["dedo"] : "PULGAR_I, INDICE_I, MEDIO_I, ANULAR_I, MENIQUE_I, PULGAR_D, INDICE_D, MEDIO_D, ANULAR_D, MENIQUE_D";
+
         $qry = <<<sql
         SELECT
             CLIENTE,
@@ -3201,16 +3203,7 @@ sql;
             HUELLAS
         UNPIVOT (
             HUELLA FOR columna IN (
-                PULGAR_I,
-                INDICE_I,
-                MEDIO_I,
-                ANULAR_I,
-                MENIQUE_I,
-                PULGAR_D,
-                INDICE_D,
-                MEDIO_D,
-                ANULAR_D,
-                MENIQUE_D
+                $d
             )
         )
         WHERE HUELLA IS NOT NULL
@@ -3243,6 +3236,50 @@ sql;
             return self::Responde(true, "Consulta realizada correctamente.", $res);
         } catch (Exception $e) {
             return self::Responde(false, "Error al consultar huellas.", null, $e->getMessage());
+        }
+    }
+
+    public static function ActualizaHuella($datos)
+    {
+        $dedos = [];
+        foreach ($datos["dedos"] as $dedo => $huella) {
+            array_push($dedos, "$dedo = '$huella'");
+        }
+        $dedos = implode(", ", $dedos);
+
+        $qry = <<<sql
+        UPDATE
+            HUELLAS
+        SET
+            $dedos
+        WHERE
+            CLIENTE = '{$datos["cliente"]}'
+        sql;
+
+        try {
+            $mysqli = Database::getInstance();
+            $res = $mysqli->insertar($qry, []);
+            return self::Responde(true, "Huellas actualizadas correctamente.", $res);
+        } catch (Exception $e) {
+            return self::Responde(false, "Error al actualizar huellas.", null, $e->getMessage());
+        }
+    }
+
+    public static function EliminaHuellas($datos)
+    {
+        $qry = <<<sql
+        DELETE FROM
+            HUELLAS
+        WHERE
+            CLIENTE = '{$datos["cliente"]}'
+        sql;
+
+        try {
+            $mysqli = Database::getInstance();
+            $res = $mysqli->eliminar($qry);
+            return self::Responde(true, "Huellas eliminadas correctamente.", $res);
+        } catch (Exception $e) {
+            return self::Responde(false, "Error al eliminar huellas.", null, $e->getMessage());
         }
     }
 }

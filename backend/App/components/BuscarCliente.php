@@ -37,8 +37,7 @@ class BuscarCliente
         <div class="row" style="height: 100px; display: flex; align-items: flex-start;">
             <div class="col-md-6">
                 <p>{$this->recordatorio}</p>
-                <hr>
-            </div>
+                </div>
             <div class="col-md-3">
                 <label for="movil">Código de cliente SICAFIN *</label>
                 <input type="text" onkeypress=validarYbuscar(event) class="form-control" id="clienteBuscado" name="clienteBuscado" placeholder="000000" required>
@@ -52,6 +51,7 @@ class BuscarCliente
                 </div>
             </div>
         </div>
+        <hr>
         html;
     }
 }

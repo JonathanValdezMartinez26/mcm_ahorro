@@ -537,6 +537,7 @@ class Ahorro extends Controller
         $saldosMM = CajaAhorroDao::GetSaldoMinimoApertura($_SESSION['cdgco_ahorro']);
         $saldoMinimoApertura = $saldosMM['MONTO_MINIMO'];
         $costoInscripcion = 200;
+        $mensajeCaptura = "Capture las huellas del cliente haciendo clic sobre una imagen.";
 
         $extraFooter = <<<html
         <script>
@@ -566,6 +567,12 @@ class Ahorro extends Controller
          
                 document.querySelector("#manoizquierda").addEventListener("muestraObtenida", huellasCompletas)
                 document.querySelector("#manoderecha").addEventListener("muestraObtenida", huellasCompletas)
+
+                document.querySelector("#manoderecha").addEventListener("validaHuella", validaHuella)
+                document.querySelector("#manoizquierda").addEventListener("validaHuella", validaHuella)
+
+                document.querySelector("#manoderecha").addEventListener("actualizaHuella", actualizaHuella)
+                document.querySelector("#manoizquierda").addEventListener("actualizaHuella", actualizaHuella)
             }
          
             {$this->showError}
@@ -1034,14 +1041,24 @@ class Ahorro extends Controller
             }
          
             const huellasCompletas = (e) => {
-                if (manoDerecha.manoLista() && manoIzquierda.manoLista()) {
-                    document.querySelector("#registraHuellas").disabled = false
-                    document.querySelector("#mensajeHuella").innerText = "Huellas capturadas correctamente."
-                    return
+                if (e.detail.modo === "captura") {
+                    if (manoDerecha.manoLista() && manoIzquierda.manoLista()) {
+                        document.querySelector("#registraHuellas").disabled = false
+                        document.querySelector("#mensajeHuella").innerText = "Huellas capturadas correctamente."
+                        return
+                    }
+            
+                    document.querySelector("#registraHuellas").disabled = true
+                    document.querySelector("#mensajeHuella").innerText = "$mensajeCaptura"
                 }
-         
-                document.querySelector("#registraHuellas").disabled = true
-                document.querySelector("#mensajeHuella").innerText = "Capture las huellas del cliente."
+
+                if (e.detail.modo === "actualizacion" && e.detail.muestrasOK) {
+                    document.querySelector("#registraHuellas").disabled = false
+                    document.querySelector("#registraHuellas").textContent = "Cancelar Registro"
+                    document.querySelector("#registraHuellas").removeEventListener("click", guardarHuellas)
+                    document.querySelector("#registraHuellas").addEventListener("click", eliminaHuellas)
+                    e.detail.evento()
+                }
             }
          
             const guardarHuellas = async () => {
@@ -1061,17 +1078,94 @@ class Ahorro extends Controller
                     if (!respuesta.success) return showError(respuesta.mensaje)
                     showSuccess(respuesta.mensaje)
                     .then(() => {
-                        manoIzquierda.limpiarMano()
-                        manoDerecha.limpiarMano()
+                        manoIzquierda.modoValidacion()
+                        manoDerecha.modoValidacion()
+                        document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente, valide y confirme."
                         document.querySelector("#registraHuellas").disabled = true
-                        document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente."
-                        document.querySelector("#chkRegistroHuellas").classList.remove("red")
-                        document.querySelector("#chkRegistroHuellas").classList.remove("fa-times")
-                        document.querySelector("#chkRegistroHuellas").classList.add("green")
-                        document.querySelector("#chkRegistroHuellas").classList.add("fa-check")
-                        document.querySelector("#lnkHuellas").style.cursor = "default"
-                        $("#modal_registra_huellas").modal("hide")
+                        document.querySelector("#cerrar_modal").disabled = true
                     })
+                })
+            }
+
+            const validaHuella = (e) => {         
+                const datos = {
+                    cliente: document.querySelector("#noCliente").value,
+                    dedo: e.detail.dedo,
+                    muestra: e.detail.muestra
+                }
+         
+                consultaServidor("/Ahorro/ValidaHuella/", datos, (respuesta) => {
+                    e.detail.colorImagen(respuesta.success ? "green" : "red")
+                    if (!respuesta.success) {
+                        e.detail.conteoErrores()
+                        return showError(respuesta.mensaje)
+                    }
+         
+                    e.detail.conteoErrores(0)
+                    e.detail.boton.style.display = "none"
+         
+                    showSuccess(respuesta.mensaje).then(() => {
+                        const botones = document.querySelectorAll(".btnHuella")
+                        if (Array.from(botones).every(boton => boton.style.display === "none")) {
+                            manoIzquierda.limpiarMano()
+                            manoDerecha.limpiarMano()
+                            document.querySelector("#registraHuellas").disabled = true
+                            document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente."
+                            document.querySelector("#chkRegistroHuellas").classList.remove("red")
+                            document.querySelector("#chkRegistroHuellas").classList.remove("fa-times")
+                            document.querySelector("#chkRegistroHuellas").classList.add("green")
+                            document.querySelector("#chkRegistroHuellas").classList.add("fa-check")
+                            document.querySelector("#lnkHuellas").style.cursor = "default"
+                            document.querySelector("#cerrar_modal").disabled = false
+                            $("#modal_registra_huellas").modal("hide")
+                        }
+                    })
+                })
+            }
+
+            const actualizaHuella = (e) => {
+                const manos = {}
+                manos[e.detail.mano] = {}
+                manos[e.detail.mano][e.detail.dedo] = e.detail.muestras
+
+                const datos = {
+                    cliente: document.querySelector("#noCliente").value,
+                    manos: JSON.stringify(manos)
+                }
+
+                consultaServidor("/Ahorro/ActualizaHuella/", datos, (respuesta) => {
+                    if (!respuesta.success) {
+                        e.detail.limpiar()
+                        e.detail.mensajeLector("Haz clic en la imagen para intentar nuevamente.")
+                        return showError(respuesta.mensaje)
+                    }
+         
+                    e.detail.valida()
+                })
+            }
+
+            const eliminaHuellas = () => {
+                const datos = {
+                    cliente: document.querySelector("#noCliente").value
+                }
+
+                consultaServidor("/Ahorro/EliminaHuellas/", datos, (respuesta) => {
+                    if (!respuesta.success) return showError(respuesta.mensaje)
+                    showSuccess(respuesta.mensaje)
+                        .then(() => {
+                            manoIzquierda.modoCaptura()
+                            manoDerecha.modoCaptura()
+                            manoIzquierda.limpiarMano()
+                            manoDerecha.limpiarMano()
+                            document.querySelector("#mensajeHuella").innerText = "$mensajeCaptura"
+                            document.querySelector("#lnkHuellas").style.cursor = "pointer"
+                            document.querySelector("#registraHuellas").disabled = true
+                            document.querySelector("#registraHuellas").textContent = "Registrar huellas"
+                            document.querySelector("#registraHuellas").removeEventListener("click", eliminaHuellas)
+                            document.querySelector("#registraHuellas").addEventListener("click", guardarHuellas)
+                            document.querySelector("#cerrar_modal").disabled = false
+                            $("#modal_registra_huellas").modal("hide")
+                        })
                 })
             }
         </script>
@@ -1107,6 +1201,7 @@ class Ahorro extends Controller
         view::set('opcParentescos', $opcParentescos);
         view::set('sucursales', $opcSucursales);
         view::set('ejecutivos', $opcEjecutivos);
+        View::set('mensajeCaptura', $mensajeCaptura);
         View::render("caja_menu_contrato_ahorro");
     }
 
@@ -1159,6 +1254,35 @@ class Ahorro extends Controller
         echo CajaAhorroDao::RegistraHuellas($datos);
     }
 
+    public function ActualizaHuella()
+    {
+        $datosEngine = [
+            "manos" => $_POST['manos'],
+        ];
+
+        $huellas = self::EngineHuellas("preregistro.php", $datosEngine);
+
+        if (!$huellas['success']) {
+            echo json_encode($huellas);
+            exit;
+        }
+
+        $dedos = [];
+        foreach ($huellas['datos'] as $mano => $dedo) {
+            foreach ($dedo as $dedo => $huella) {
+                $d = $dedo . "_" . $mano[0];
+                $dedos[$d] = $huella;
+            }
+        }
+
+        $datos = [
+            "cliente" => $_POST['cliente'],
+            "dedos" => $dedos,
+        ];
+
+        echo CajaAhorroDao::ActualizaHuella($datos);
+    }
+
     public function ValidaHuella()
     {
         $repuesta = [
@@ -1166,7 +1290,7 @@ class Ahorro extends Controller
             "mensaje" => "No se ha podido validar la huella."
         ];
 
-        $huellas = CajaAhorroDao::GetHuellas($_POST['cliente']);
+        $huellas = CajaAhorroDao::GetHuellas($_POST);
 
         if (count($huellas) == 0) {
             $repuesta['mensaje'] = "No se encontraron registros en la base de datos.";
@@ -1211,6 +1335,11 @@ class Ahorro extends Controller
     public function ValidaRegistroHuellas()
     {
         echo CajaAhorroDao::ValidaRegistroHuellas($_POST);
+    }
+
+    public function EliminaHuellas()
+    {
+        echo CajaAhorroDao::EliminaHuellas($_POST);
     }
 
     // Movimientos sobre cuentas de ahorro corriente //

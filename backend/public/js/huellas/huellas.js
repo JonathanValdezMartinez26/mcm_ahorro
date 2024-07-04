@@ -31,7 +31,8 @@ const LectorHuellas = (() => {
             this.estatus = {
                 conectado: "Lector de huella conectado.",
                 desconectado: "Lector de huella desconectado.",
-                lecturaI: "Lector de huella listo para capturar muestra.",
+                lecturaI:
+                    "Coloque firmemente el dedo sobre el lector y no lo retire hasta que la luz roja se apague.",
                 lecturaF: "El lector de huella ha terminado de capturar la muestra.",
                 lecturaOK: "Muestra capturada correctamente.",
                 reconectado: "Lector de huella reconectado, puede continuar."
@@ -173,7 +174,7 @@ class Dedo {
         this.etiqueta = null
         this.selector = null
         this.muestras = []
-        this.eventoCaptura = new CustomEvent("muestraObtenida")
+        this.modoActivo = "captura"
 
         this.setImagen()
         this.setEtiqueta()
@@ -265,9 +266,17 @@ class Dedo {
 
     limpiar() {
         this.muestras = []
+        this.erroresValidacion = 0
         this.setTextoEtiqueta()
         this.actualizaProgreso()
-        this.contenedor.dispatchEvent(this.eventoCaptura)
+        this.contenedor.dispatchEvent(
+            new CustomEvent("muestraObtenida", {
+                detail: {
+                    modo: this.modoActivo,
+                    muestrasOK: this.listo()
+                }
+            })
+        )
     }
 
     actualizaProgreso(valor = null) {
@@ -282,11 +291,33 @@ class Dedo {
         this.erroresValidacion = valor || this.erroresValidacion + 1
     }
 
+    eventoActualizacion() {
+        this.contenedor.dispatchEvent(
+            new CustomEvent("actualizaHuella", {
+                detail: {
+                    muestras: this.muestras,
+                    dedo: this.getNombreDedo(),
+                    mano: this.mano,
+                    colorImagen: this.setColorImagen.bind(this),
+                    boton: this.boton,
+                    erroresValidacion: this.erroresValidacion,
+                    conteoErrores: this.actualizaConteoErrores.bind(this),
+                    mensajeLector: this.lector.notificacion.bind(this.lector),
+                    valida: this.modoValidacion.bind(this),
+                    limpiar: this.limpiar.bind(this)
+                }
+            })
+        )
+    }
+
     modoAutorizacion() {
+        this.modoActivo = "autorizacion"
         this.etiqueta.style.display = "none"
         this.muestras = []
+        this.erroresValidacion = 0
         this.actualizaProgreso(0)
         this.selector.style.display = "none"
+        this.setColorImagen(null)
 
         const imagen = this.imagen.cloneNode(true)
         imagen.addEventListener("click", this.validacion.bind(this))
@@ -303,15 +334,19 @@ class Dedo {
     }
 
     modoValidacion() {
+        this.modoActivo = "validacion"
         this.etiqueta.style.display = "none"
         this.muestras = []
+        this.erroresValidacion = 0
         this.actualizaProgreso(0)
         this.selector.style.display = "none"
+        this.setColorImagen(null)
 
         const imagen = this.imagen.cloneNode(true)
         const boton = this.boton.cloneNode(true)
 
         boton.innerHTML = "Validar"
+        boton.style.display = "block"
         boton.addEventListener("click", this.validacion.bind(this))
 
         this.imagen.replaceWith(imagen)
@@ -322,15 +357,43 @@ class Dedo {
     }
 
     modoCaptura() {
+        this.modoActivo = "captura"
         this.etiqueta.style.display = "block"
         this.muestras = []
+        this.erroresValidacion = 0
         this.actualizaProgreso(0)
         this.selector.style.display = "block"
+        this.setColorImagen(null)
 
         const imagen = this.imagen.cloneNode(true)
         const boton = this.boton.cloneNode(true)
 
         boton.innerHTML = "Limpiar"
+        boton.style.display = "block"
+        boton.addEventListener("click", this.limpiar.bind(this))
+
+        this.imagen.replaceWith(imagen)
+        this.boton.replaceWith(boton)
+        this.imagen = imagen
+        this.boton = boton
+        this.configurarImagen()
+    }
+
+    modoActualizacion() {
+        this.modoActivo = "actualizacion"
+        this.etiqueta.style.display = "block"
+        this.muestras = []
+        this.erroresValidacion = 0
+        this.actualizaProgreso(0)
+        this.setTextoEtiqueta()
+        this.selector.style.display = "block"
+        this.setColorImagen(null)
+
+        const imagen = this.imagen.cloneNode(true)
+        const boton = this.boton.cloneNode(true)
+
+        boton.innerHTML = "Limpiar"
+        boton.style.display = "block"
         boton.addEventListener("click", this.limpiar.bind(this))
 
         this.imagen.replaceWith(imagen)
@@ -345,18 +408,7 @@ class Dedo {
         this.lector
             .getLectores()
             .then((lectores) => {
-                if (!lectores.length)
-                    return this.lector
-                        .errorSinLector()
-                        .catch((error) => this.lector.notificacion(error.message, true))
-
-                if (lectores.length === 1) return this.lector.setLector(lectores[0])
-
-                this.lector
-                    .errorMiltilpleLector()
-                    .catch((error) => this.lector.notificacion(error.message, true))
-
-                lectores.forEach((lector) => console.log(lector))
+                this.compruebaLector(lectores)
             })
             .then(() => {
                 if (!this.lector.getEstatusLector()) return
@@ -367,7 +419,16 @@ class Dedo {
                     this.actualizaProgreso()
                     this.lector.notificacion(this.lector.estatus.lecturaOK)
                     this.lector.detenerCaptura()
-                    this.contenedor.dispatchEvent(this.eventoCaptura)
+                    this.contenedor.dispatchEvent(
+                        new CustomEvent("muestraObtenida", {
+                            detail: {
+                                modo: this.modoActivo,
+                                muestrasOK: this.listo(),
+                                boton: this.boton,
+                                evento: this.eventoActualizacion.bind(this)
+                            }
+                        })
+                    )
                 })
 
                 this.lector.iniciarCaptura()
@@ -376,22 +437,19 @@ class Dedo {
     }
 
     validacion() {
-        this.imagen.querySelector("#fondoHuella").style.fill = "#fff"
+        if (this.modoActivo == "validacion" && this.erroresValidacion >= 5) {
+            this.lector.notificacion(
+                "Se ha alcanzado el número máximo de intentos, vuelva a capturar la información.",
+                true
+            )
+            this.modoActualizacion()
+            return
+        }
+        this.imagen.querySelector("#fondoHuella").style.fill = null
         this.lector
             .getLectores()
             .then((lectores) => {
-                if (!lectores.length)
-                    return this.lector
-                        .errorSinLector()
-                        .catch((error) => this.lector.notificacion(error.message, true))
-
-                if (lectores.length === 1) return this.lector.setLector(lectores[0])
-
-                this.lector
-                    .errorMiltilpleLector()
-                    .catch((error) => this.lector.notificacion(error.message, true))
-
-                lectores.forEach((lector) => console.log(lector))
+                this.compruebaLector(lectores)
             })
             .then(() => {
                 if (!this.lector.getEstatusLector()) return
@@ -404,12 +462,13 @@ class Dedo {
                         new CustomEvent("validaHuella", {
                             detail: {
                                 muestra: sample.Data,
-                                dedo: this.getNombreDedo(),
+                                dedo: this.getNombreDedo() + "_" + this.mano.charAt(0),
                                 colorImagen: this.setColorImagen.bind(this),
                                 boton: this.boton,
                                 erroresValidacion: this.erroresValidacion,
                                 conteoErrores: this.actualizaConteoErrores.bind(this),
-                                mensajeLector: this.lector.notificacion.bind(this.lector)
+                                mensajeLector: this.lector.notificacion.bind(this.lector),
+                                actualliza: this.modoActualizacion.bind(this)
                             }
                         })
                     )
@@ -417,5 +476,20 @@ class Dedo {
 
                 this.lector.iniciarCaptura()
             })
+    }
+
+    compruebaLector(lectores) {
+        if (!lectores.length)
+            return this.lector
+                .errorSinLector()
+                .catch((error) => this.lector.notificacion(error.message, true))
+
+        if (lectores.length === 1) return this.lector.setLector(lectores[0])
+
+        this.lector
+            .errorMiltilpleLector()
+            .catch((error) => this.lector.notificacion(error.message, true))
+
+        lectores.forEach((lector) => console.log(lector))
     }
 }

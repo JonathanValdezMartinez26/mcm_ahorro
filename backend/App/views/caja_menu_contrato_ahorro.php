@@ -293,11 +293,11 @@ $derecha = new TarjetaMano('derecha');
 </div>
 
 <!-- <div class="modal fade in" id="modal_registra_huellas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: block; padding-right: 15px;"> -->
-<div class="modal fade" id="modal_registra_huellas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal_registra_huellas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <button id="cerrar_modal" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel">Registro de huellas dactilares</h4>
             </div>
             <div class="modal-body">
@@ -322,12 +322,12 @@ $derecha = new TarjetaMano('derecha');
                     </div>
                     <br>
                     <div class="row">
-                        <div id="notificacionesHuella" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50px;">
-                            <span id="mensajeHuella" style="font-size: x-large">Capture las huellas del cliente, haga clic sobre una imagen.</span>
+                        <div id="notificacionesHuella" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100px;">
+                            <span id="mensajeHuella" style="font-size: x-large; text-align: center;"><?= $mensajeCaptura ?></span>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="registraHuellas" class="btn btn-primary" onclick=guardarHuellas() disabled><span class="glyphicon glyphicon-floppy-disk"></span> Registrar huellas</button>
+                        <button id="registraHuellas" class="btn btn-primary" onclick=guardarHuellas() disabled><span class="glyphicon glyphicon-floppy-disk"></span>Registrar huellas</button>
                     </div>
                 </div>
             </div>
