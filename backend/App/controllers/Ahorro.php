@@ -551,7 +551,6 @@ class Ahorro extends Controller
             let manoDerecha
          
             window.onload = () => {
-                if(document.querySelector("#clienteBuscado").value !== "") buscaCliente()
                 const lector = new LectorHuellas(
                 {
                     notificacion: (mensaje, error = false) => {
@@ -573,6 +572,8 @@ class Ahorro extends Controller
 
                 document.querySelector("#manoderecha").addEventListener("actualizaHuella", actualizaHuella)
                 document.querySelector("#manoizquierda").addEventListener("actualizaHuella", actualizaHuella)
+                
+                if(document.querySelector("#clienteBuscado").value !== "") buscaCliente()
             }
          
             {$this->showError}
@@ -709,6 +710,10 @@ class Ahorro extends Controller
                     document.querySelector("#codigo_cl_huellas").value = noCliente
                     document.querySelector("#nombre_cliente_huellas").value = datosCL.NOMBRE
                     noCliente.value = ""
+                    document.querySelector("#instruccionesValidacion").style.display = "none"
+                    document.querySelector("#instruccionesCaptura").style.display = "block"
+                    manoIzquierda.limpiarMano()
+                    manoDerecha.limpiarMano()
                     if (respuesta.success) habilitaBeneficiario(1, true)
                 })
             }
@@ -1053,10 +1058,6 @@ class Ahorro extends Controller
                 }
 
                 if (e.detail.modo === "actualizacion" && e.detail.muestrasOK) {
-                    document.querySelector("#registraHuellas").disabled = false
-                    document.querySelector("#registraHuellas").textContent = "Cancelar Registro"
-                    document.querySelector("#registraHuellas").removeEventListener("click", guardarHuellas)
-                    document.querySelector("#registraHuellas").addEventListener("click", eliminaHuellas)
                     e.detail.evento()
                 }
             }
@@ -1081,8 +1082,10 @@ class Ahorro extends Controller
                         manoIzquierda.modoValidacion()
                         manoDerecha.modoValidacion()
                         document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente, valide y confirme."
-                        document.querySelector("#registraHuellas").disabled = true
-                        document.querySelector("#cerrar_modal").disabled = true
+                        document.querySelector("#registraHuellas").style.display = "none"
+                        document.querySelector("#cerrar_modal").style.display = "none"
+                        document.querySelector("#instruccionesCaptura").style.display = "none"
+                        document.querySelector("#instruccionesValidacion").style.display = "block"
                     })
                 })
             }
@@ -1109,14 +1112,16 @@ class Ahorro extends Controller
                         if (Array.from(botones).every(boton => boton.style.display === "none")) {
                             manoIzquierda.limpiarMano()
                             manoDerecha.limpiarMano()
-                            document.querySelector("#registraHuellas").disabled = true
+                            document.querySelector("#registraHuellas").style.display = null
                             document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente."
                             document.querySelector("#chkRegistroHuellas").classList.remove("red")
                             document.querySelector("#chkRegistroHuellas").classList.remove("fa-times")
                             document.querySelector("#chkRegistroHuellas").classList.add("green")
                             document.querySelector("#chkRegistroHuellas").classList.add("fa-check")
                             document.querySelector("#lnkHuellas").style.cursor = "default"
-                            document.querySelector("#cerrar_modal").disabled = false
+                            document.querySelector("#cerrar_modal").style.display = null
+                            document.querySelector("#instruccionesValidacion").style.display = "none"
+                            document.querySelector("#instruccionesCaptura").style.display = "block"
                             $("#modal_registra_huellas").modal("hide")
                         }
                     })
@@ -1141,31 +1146,6 @@ class Ahorro extends Controller
                     }
          
                     e.detail.valida()
-                })
-            }
-
-            const eliminaHuellas = () => {
-                const datos = {
-                    cliente: document.querySelector("#noCliente").value
-                }
-
-                consultaServidor("/Ahorro/EliminaHuellas/", datos, (respuesta) => {
-                    if (!respuesta.success) return showError(respuesta.mensaje)
-                    showSuccess(respuesta.mensaje)
-                        .then(() => {
-                            manoIzquierda.modoCaptura()
-                            manoDerecha.modoCaptura()
-                            manoIzquierda.limpiarMano()
-                            manoDerecha.limpiarMano()
-                            document.querySelector("#mensajeHuella").innerText = "$mensajeCaptura"
-                            document.querySelector("#lnkHuellas").style.cursor = "pointer"
-                            document.querySelector("#registraHuellas").disabled = true
-                            document.querySelector("#registraHuellas").textContent = "Registrar huellas"
-                            document.querySelector("#registraHuellas").removeEventListener("click", eliminaHuellas)
-                            document.querySelector("#registraHuellas").addEventListener("click", guardarHuellas)
-                            document.querySelector("#cerrar_modal").disabled = false
-                            $("#modal_registra_huellas").modal("hide")
-                        })
                 })
             }
         </script>

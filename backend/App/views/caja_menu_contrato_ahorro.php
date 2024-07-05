@@ -316,11 +316,29 @@ $derecha = new TarjetaMano('derecha');
                             </div>
                         </div>
                     </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: center; display: block;" id="instruccionesCaptura">
+                            <p>
+                                Para el registro de huellas dactilares, haga clic sobre una de las imagenes y solicite al cliente que coloque su dedo sobre el lector de huellas.
+                            </p>
+                            <p>
+                                Se requieren 5 muestras por cada dedo y, en caso de ser necesario, puede seleccionar el dedo que se va a registrar en el sistema.
+                            </p>
+                        </div>
+                        <div class="col-md-12" style="text-align: center; display: none;" id="instruccionesValidacion">
+                            <p>
+                                Haga clic en el boton del dedo que desea validar y solicite al cliente que coloque su dedo sobre el lector de huellas.
+                            </p>
+                            <p>
+                                Si la validación falla en 2 ocasiones, se le solicitará que registre nuevamente las huellas de ese dedo.
+                            </p>
+                        </div>
+                    </div>
                     <div class="row">
                         <?= $izquierda->mostrar(); ?>
                         <?= $derecha->mostrar(); ?>
                     </div>
-                    <br>
                     <div class="row">
                         <div id="notificacionesHuella" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100px;">
                             <span id="mensajeHuella" style="font-size: x-large; text-align: center;"><?= $mensajeCaptura ?></span>

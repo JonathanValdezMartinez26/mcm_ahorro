@@ -339,7 +339,8 @@ class Dedo {
         this.muestras = []
         this.erroresValidacion = 0
         this.actualizaProgreso(0)
-        this.selector.style.display = "none"
+        this.selector.disabled = true
+        this.selector.style.display = "block"
         this.setColorImagen(null)
 
         const imagen = this.imagen.cloneNode(true)
@@ -437,7 +438,7 @@ class Dedo {
     }
 
     validacion() {
-        if (this.modoActivo == "validacion" && this.erroresValidacion >= 5) {
+        if (this.modoActivo == "validacion" && this.erroresValidacion >= 2) {
             this.lector.notificacion(
                 "Se ha alcanzado el número máximo de intentos, vuelva a capturar la información.",
                 true

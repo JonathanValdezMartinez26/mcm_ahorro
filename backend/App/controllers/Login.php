@@ -1,32 +1,31 @@
 <?php
+
 namespace App\controllers;
-defined("APPPATH") OR die("Access denied");
+
+defined("APPPATH") or die("Access denied");
 
 use \Core\View;
 use \Core\MasterDom;
-use \App\models\Login AS LoginDao;
+use \App\models\Login as LoginDao;
 
 class Login
 {
     function __construct()
-	{
+    {
     }
 
     public function index()
-	{
+    {
         $extraHeader = <<<html
             <link rel="stylesheet" href="/css/bootstrap/bootstrap.css">
             <link rel="stylesheet" href="/css/bootstrap/datatables.bootstrap.css">
             <link rel="stylesheet" href="/css/contenido/custom.min.css">
             <link rel="stylesheet" href="/css/validate/screen.css">
-            <link rel="stylesheet" type="text/css" href="/librerias/vintage_flip_clock/jquery.flipcountdown.css" />
         html;
 
         $extraFooter = <<<html
             <script src="/js/jquery.min.js"></script>
             <script src="/js/validate/jquery.validate.js"></script>
-            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-            <script type="text/javascript" src="/librerias/vintage_flip_clock/jquery.flipcountdown.js"></script>
             <script>
                 document.getElementById("usuario").focus()
                 function enviar_formulario() {
@@ -119,29 +118,21 @@ class Login
                             }
                         })
                     })
-                    $(function () {
-                        var i = 1
-                        $("#retroclockbox1").flipcountdown({
-                            tick: function () {
-                                return i++
-                            }
-                        })
-                    })
                 })
             </script>
         html;
-        View::set('header',$extraHeader);
-        View::set('footer',$extraFooter);
+        View::set('header', $extraHeader);
+        View::set('footer', $extraFooter);
         View::render("login");
     }
 
     public function isUserValidate()
-	{
+    {
         echo (count(LoginDao::getUser($_POST['usuario'])) >= 1) ? 'true' : 'false';
     }
 
     public function verificarUsuario()
-	{
+    {
         $usuario = new \stdClass();
         $usuario->_usuario = MasterDom::getData("usuario");
         $usuario->_password = MasterDom::getData("password");
@@ -154,21 +145,18 @@ class Login
     }
 
     public function crearSession()
-	{
+    {
         $usuario = new \stdClass();
         $usuario->_usuario = MasterDom::getData("usuario");
         $usuario->_password = MasterDom::getData("password");
         $user = LoginDao::getById($usuario);
 
-        if($user[1]['PERMISO'] == '')
-        {
+        if ($user[1]['PERMISO'] == '') {
             $permiso = 0;
             $cdgco_ahorro = 'NULL';
             $inicio_ahorro = 'NULL';
             $fin_ahorro = 'NULL';
-        }
-        else
-        {
+        } else {
             $permiso = $user[1]['PERMISO'];
             $cdgco_ahorro = $user[1]['CDGCO_AHORRO'];
             $inicio_ahorro = $user[1]['HORA_APERTURA'];
@@ -185,12 +173,12 @@ class Login
         $_SESSION['cdgco_ahorro'] = $cdgco_ahorro;
         $_SESSION['inicio'] = $inicio_ahorro;
         $_SESSION['fin'] = $fin_ahorro;
-		
-		header("location: /Principal/");
+
+        header("location: /Principal/");
     }
 
     public function cerrarSession()
-	{
+    {
         unset($_SESSION);
         session_unset();
         session_destroy();
