@@ -710,8 +710,6 @@ class Ahorro extends Controller
                     document.querySelector("#codigo_cl_huellas").value = noCliente
                     document.querySelector("#nombre_cliente_huellas").value = datosCL.NOMBRE
                     noCliente.value = ""
-                    document.querySelector("#instruccionesValidacion").style.display = "none"
-                    document.querySelector("#instruccionesCaptura").style.display = "block"
                     manoIzquierda.limpiarMano()
                     manoDerecha.limpiarMano()
                     if (respuesta.success) habilitaBeneficiario(1, true)
@@ -1084,8 +1082,6 @@ class Ahorro extends Controller
                         document.querySelector("#mensajeHuella").innerText = "Huellas registradas correctamente, valide y confirme."
                         document.querySelector("#registraHuellas").style.display = "none"
                         document.querySelector("#cerrar_modal").style.display = "none"
-                        document.querySelector("#instruccionesCaptura").style.display = "none"
-                        document.querySelector("#instruccionesValidacion").style.display = "block"
                     })
                 })
             }
@@ -1120,9 +1116,9 @@ class Ahorro extends Controller
                             document.querySelector("#chkRegistroHuellas").classList.add("fa-check")
                             document.querySelector("#lnkHuellas").style.cursor = "default"
                             document.querySelector("#cerrar_modal").style.display = null
-                            document.querySelector("#instruccionesValidacion").style.display = "none"
-                            document.querySelector("#instruccionesCaptura").style.display = "block"
-                            $("#modal_registra_huellas").modal("hide")
+                            showSuccess("Huellas validadas correctamente.").then(() => {
+                                $("#modal_registra_huellas").modal("hide")
+                            })
                         }
                     })
                 })
