@@ -28,17 +28,7 @@ class Principal extends Controller
 
     public function index()
     {
-        $extraHeader = <<<html
-        <title>Principal MCM</title>
-        <link rel="shortcut icon" href="/img/logo.png">
-html;
-
-        if ($this->__perfil == 'CALLC') {
-            View::set('header', $this->_contenedor->header($extraHeader));
-            View::render("principal_call_center");
-        } else {
-            View::set('header', $this->_contenedor->header($extraHeader));
-            View::render("principal_all");
-        }
+        View::set('header', $this->_contenedor->header(self::GetExtraHeader('Principal MCM')));
+        View::render("principal");
     }
 }

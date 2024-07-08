@@ -79,7 +79,7 @@ class App
             }
             else
             {
-                View::render("principal_all");
+                View::render("principal");
             }
         }
         //asociamos el resto de segmentos a $this->_params para pasarlos al método llamado, por defecto será un array vacío
