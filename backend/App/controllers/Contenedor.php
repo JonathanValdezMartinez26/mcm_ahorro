@@ -23,8 +23,6 @@ class Contenedor extends Controller
 
     public function header($extra = '')
     {
-        //date_default_timezone_set('America/Mexico_City');
-        date_default_timezone_set('America/Mazatlan');
         $usuario = $this->__usuario;
         $nombre = $this->__nombre;
         $sucursal = $this->__cdgco;
@@ -34,64 +32,59 @@ class Contenedor extends Controller
         $header = <<<html
         <!DOCTYPE html>
         <html lang="es">
-            <head>
-                <meta http-equiv="Expires" content="0">
-                <meta http-equiv="Last-Modified" content="0">
-                <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
-                <meta http-equiv="Pragma" content="no-cache">
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <meta charset="utf-8">
-                
-                <link rel="shortcut icon" href="/img/logo.png">
-                <link rel="stylesheet" type="text/css" href="/css/nprogress.css">
-                <link rel="stylesheet" type="text/css" href="/css/loader.css">
-                <link rel="stylesheet" type="text/css" href="/css/tabla/sb-admin-2.css">
-                <link rel="stylesheet" type="text/css" href="/css/bootstrap/datatables.bootstrap.css">
-                <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.css">
-                <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap-switch.css">
-                <link rel="stylesheet" type="text/css" href="/css/validate/screen.css">
-                <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.min.css">
-                <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
-                <link rel="stylesheet" type="text/css" href="/css/menu/menu5custom.min.css">
-                <link rel="stylesheet" type="text/css" href="/css/green.css">
-                <link rel="stylesheet" type="text/css" href="/css/custom.min.css">
-                $extra 
-            </head>
-html;
-        $menu = <<<html
-<body class="nav-md" >
-  <div class="container body" >
-    <div class="main_container" style="background: #ffffff">
-
-      <div class="col-md-3 left_col">
-        <div class="left_col scroll-view">
-          <div class="navbar nav_title" style="border: 0;"> 
-            <a href="/Principal/" class="site_title"><i class="fa fa-home"></i> <span>MCM</span></a>
-          </div>
-          <div class="clearfix"></div>
-          <div class="profile clearfix">
-            <div class="profile_pic">
-              <img src="/img/profile_default.jpg" alt="..." class="img-circle profile_img">
-            </div>
-            <div class="profile_info">
-              <span><b>USUARIO:</b> {$usuario}</span>
-              <br>
-              <span><b>PERFIL:</b> <span class="fa fa-key"></span> {$perfil}</span>
-              
-html;
-
-        $menu .= <<<html
-            </div>
-          </div>
-          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-            <div class="menu_section">
-html;
+        <head>
+            <meta http-equiv="Expires" content="0">
+            <meta http-equiv="Last-Modified" content="0">
+            <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+            <meta http-equiv="Pragma" content="no-cache">
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <meta charset="utf-8">
+            
+            <link rel="shortcut icon" href="/img/logo_ico.png">
+            <link rel="stylesheet" type="text/css" href="/css/nprogress.css">
+            <link rel="stylesheet" type="text/css" href="/css/loader.css">
+            <link rel="stylesheet" type="text/css" href="/css/tabla/sb-admin-2.css">
+            <link rel="stylesheet" type="text/css" href="/css/bootstrap/datatables.bootstrap.css">
+            <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.css">
+            <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap-switch.css">
+            <link rel="stylesheet" type="text/css" href="/css/validate/screen.css">
+            <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.min.css">
+            <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
+            <link rel="stylesheet" type="text/css" href="/css/menu/menu5custom.min.css">
+            <link rel="stylesheet" type="text/css" href="/css/green.css">
+            <link rel="stylesheet" type="text/css" href="/css/custom.min.css">
+            $extra 
+        </head>
+        <body class="nav-md">
+            <div class="container body" >
+                <div class="main_container" style="background: #ffffff">
+                    <div class="col-md-3 left_col">
+                        <div class="left_col scroll-view">
+                            <div class="navbar nav_title" style="border: 0;"> 
+                                <a href="/Principal/" class="site_title" style="display: flex; align-items: center; justify-content: center; padding: 0; margin: 0;">
+                                    <img src="/img/logo_nombre.png" alt="Login" width="210px">
+                                </a>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="profile clearfix">
+                                <div class="profile_pic">
+                                    <img src="/img/profile_default.jpg" alt="..." class="img-circle profile_img">
+                                </div>
+                                <div class="profile_info">
+                                    <span><b>USUARIO:</b> {$usuario}</span>
+                                    <br>
+                                    <span><b>PERFIL:</b> <span class="fa fa-key"></span> {$perfil}</span>
+                                </div>
+                            </div>
+                            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                                <div class="menu_section">
+        html;
 
 
         if ($permiso_ahorro == '1' || $this->__usuario == 'LGFR' || $this->__usuario == 'PAES' || $this->__usuario == 'PMAB' || $this->__usuario == 'AMGM' || $this->__usuario == 'DCRI' || $this->__usuario == 'GUGJ' || $this->__usuario == 'JUSA' || $this->__usuario == 'HEDC') {
             $menu .= <<<html
-           <hr>
-           <h3>General WEB AHORRO</h3>
+            <hr>
+            <h3>General WEB AHORRO</h3>
             <ul class="nav side-menu">     
 html;
         }
@@ -249,38 +242,6 @@ html;
               </ul>
 html;
         }
-        if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLD') {
-            $menu .= <<<html
-              <ul class="nav side-menu">
-                <li><a><i class="glyphicon glyphicon glyphicon-th-list	
-"> </i>&nbsp; Operaciones <span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu">
-                   <li><a href="/Operaciones/ReportePLDDesembolsos/">PLD Reporte Desembolsos</a></li>
-                   <li><a href="/Operaciones/ReportePLDPagos/">PLD Reporte Pagos</a></li>
-                   <li><a href="/Operaciones/ReportePLDPagosNacimiento/">PLD R. Pagos Edad</a></li>
-                   <li><a href="/Operaciones/IdentificacionClientes/">Identificación (Clientes)</a></li>
-                   <li><a href="/Operaciones/CuentasRelacionadas/">Cuentas Relacionadas</a></li>
-                   <li><a href="/Operaciones/PerfilTransaccional/">Perfil Transaccional</a></li>
-                   <li><a href="/Operaciones/UDIS_DOLAR/">Cargar UDIS y DOLAR</a></li>
-                  </ul>
-                </li>
-              </ul>
-html;
-        }
-
-        if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLD') {
-            $menu .= <<<html
-              <ul class="nav side-menu">
-                <li><a><i class="glyphicon glyphicon glyphicon glyphicon-globe"> 
-                </i>&nbsp;Api Condusef<span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu">
-                   <li><a href="/ApiCondusef/AddRedeco/">Registrar Quejas REDECO</a></li>
-                     <li><a href="/ApiCondusef/AddReune/">Registrar Quejas REUNE</a></li>
-                  </ul>
-                </li>
-              </ul>
-html;
-        }
 
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLMV' || $this->__usuario == 'MCDP') {
             $menu .= <<<html
@@ -308,16 +269,17 @@ html;
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLMV' || $this->__usuario == 'PHEE') {
             $menu .= <<<html
         <ul class="nav side-menu">
-                <li><a><i class="glyphicon glyphicon glyphicon-cog"> 
-                </i>&nbsp;Incidencias MCM<span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu">
-                  <li><a href="/Incidencias/AutorizaRechazaSolicitud/">Error Autorizar y/o Rechazar Solicitud</a></li>
-                  <li><a href="/Incidencias/CalculoDevengo/">Calculo de Devengos</a></li>
-                  <li><a href="/Incidencias/CancelarRefinanciamiento/">Cancelar Refinanciamiento</a></li>
-                  <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Cambio de Fecha para Pagos No conciliados del día</a></li>
-                  <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Telaraña agregar referencias</a></li>
-                  </ul>
-                </li>
+            <li>
+                <a><i class="glyphicon glyphicon glyphicon-cog"> 
+            </i>&nbsp;Incidencias MCM<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="/Incidencias/AutorizaRechazaSolicitud/">Error Autorizar y/o Rechazar Solicitud</a></li>
+                    <li><a href="/Incidencias/CalculoDevengo/">Calculo de Devengos</a></li>
+                    <li><a href="/Incidencias/CancelarRefinanciamiento/">Cancelar Refinanciamiento</a></li>
+                    <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Cambio de Fecha para Pagos No conciliados del día</a></li>
+                    <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Telaraña agregar referencias</a></li>
+                </ul>
+            </li>
         </ul>
 html;
         }
@@ -361,37 +323,34 @@ html;
               </ul>
 html;
         }
+
         $menu .= <<<html
-              </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="top_nav">
-        <div class="nav_menu">
-          <nav>
-            <div class="nav toggle">
-              <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <ul class="nav navbar-nav navbar-right">
-              <li class="">
-                <a href="" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <span class=" fa fa-user"></span> {$nombre}
-                    <span class=" fa fa-angle-down"></span>
-                  </a>
-                <ul class="dropdown-menu dropdown-usermenu pull-right">
-                 
-                  <li><a href="/Login/cerrarSession"><i class="fa fa-sign-out pull-right"></i>Cerrar Sesión</a></li>
-                </ul>
-              </li>
-            </ul>
-          </nav>
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <div class="nav toggle">
+                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="">
+                                <a href="" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class=" fa fa-user"></span> {$nombre}
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                    <li><a href="/Login/cerrarSession"><i class="fa fa-sign-out pull-right"></i>Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
-      </div>
-
-    </div>
-
-html;
+        html;
 
         return $header . $menu;
     }
@@ -399,157 +358,28 @@ html;
     public function footer($extra = '')
     {
         $footer = <<<html
-          </div>
-          
-        <script src="/js/moment/moment.min.js"></script>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-        <script src="/js/jquery.min.js"></script>
-        <!-- Bootstrap -->
-        <script src="/js/bootstrap.min.js"></script>
-        <script src="/js/bootstrap/bootstrap-switch.js"></script>
-        <script src="/js/nprogress.js"></script>
-        <!-- Custom Theme Scripts -->
-        <script src="/js/custom.min.js"></script>
-
-        <script src="/js/validate/jquery.validate.js"></script>
-        <script src="/js/login.js"></script>
-
-        <script src="/js/tabla/jquery.dataTables.min.js"></script>
-        <script src="/js/tabla/dataTables.bootstrap.min.js"></script>
-        <script src="/js/tabla/jquery.tablesorter.js"></script>
-
-        <!-- EXTENCIONES DE DATATABLE() PARA EXPORTAR  -->
-        <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js" ></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" ></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js" ></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js" ></script>
-        <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js" ></script>
-       <script>
-       
-       function ponerElCursorAlFinal(id)
-        {
-            var el = document.getElementById(id);
-            el.selectionStart=el.selectionEnd=el.value.length;
-            el.focus();
-        }
-        
-        function Delete_Garantias(secuencia) {
-            credito = getParameterByName('Credito');
-            secuencias = secuencia;
-    
-            alertify.confirm('¿Segúro que desea eliminar lo seleccionado?', function(response){
-                if(response){
-    
-                    $.ajax({
-                        type: "POST",
-                        url: "/Creditos/DeleteGarantia/",
-                        data: {"credito" : credito, "secuencia" : secuencias},
-                        success: function(response){
-                            //alert(response);
-                            if(response != '0')
-                            {
-                                alertify.success("Se ha eliminado correctamente");
-                                location.reload();
-    
-                            }
-                            else
-                            {
-                                alertify.error("Error, al eliminar.");
-                            }
-                        }
-                    });
-    
-    
-                }
-            });
-    
-        }
-        function Edit_Garantias(articulo_p, marca_p, modelo_p, no_serie_p, monto_p, factura_p, secuencia_p) {
-            $('#articulo_e').val(articulo_p);
-            $('#marca_e').val(marca_p);
-            $('#modelo_e').val(modelo_p);
-            $('#serie_e').val(no_serie_p);
-            $('#valor_e').val(monto_p);
-            $('#factura_e').val(factura_p);
-            $('#secuencia_e').val(secuencia_p);
-            $('#modal_editar_articulo').modal('show');
-    
-        }
-        function Update_Garantias(secuencia) {
-    
-            secuencias = secuencia;
-    
-            alertify.confirm('¿Segúro que desea eliminar lo seleccionado?', function(response){
-                if(response){
-    
-                    $.ajax({
-                        type: "POST",
-                        url: "/Creditos/DeleteGarantia/",
-                        data: {"credito" : credito, "secuencia" : secuencias},
-                        success: function(response){
-                            //alert(response);
-                            if(response != '0')
-                            {
-                                alertify.success("Se ha eliminado correctamente");
-                                location.reload();
-    
-                            }
-                            else
-                            {
-                                alertify.error("Error, al eliminar.");
-                            }
-                        }
-                    });
-    
-    
-                }
-            });
-    
-        }
-    
-        function check(e) {
-            tecla = (document.all) ? e.keyCode : e.which;
-    
-            //Tecla de retroceso para borrar, siempre la permite
-            if (tecla == 8) {
-                return true;
-            }
-    
-            // Patrón de entrada, en este caso solo acepta numeros y letras
-            patron = /[A-Za-z]/;
-            tecla_final = String.fromCharCode(tecla);
-            return patron.test(tecla_final);
-        }
-    
-        function check_t(e) {
-            tecla = (document.all) ? e.keyCode : e.which;
-    
-            //Tecla de retroceso para borrar, siempre la permite
-            if (tecla == 8) {
-                return true;
-            }
-    
-            // Patrón de entrada, en este caso solo acepta numeros y letras
-            patron = /[A-Za-z0-9]/;
-            tecla_final = String.fromCharCode(tecla);
-            return patron.test(tecla_final);
-        }
-    
-        function mayus(e) {
-            e.value = e.value.toUpperCase();
-        }
-        
-        $(window).load(function() {
-    $(".loader").fadeOut("slow");
-});
-</script>
-    $extra
-  </body>
-</html>
-
-html;
-
+            </div>
+            <script src="/js/moment/moment.min.js"></script>
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+            <script src="/js/jquery.min.js"></script>
+            <script src="/js/bootstrap.min.js"></script>
+            <script src="/js/bootstrap/bootstrap-switch.js"></script>
+            <script src="/js/nprogress.js"></script>
+            <script src="/js/custom.min.js"></script>
+            <script src="/js/validate/jquery.validate.js"></script>
+            <script src="/js/login.js"></script>
+            <script src="/js/tabla/jquery.dataTables.min.js"></script>
+            <script src="/js/tabla/dataTables.bootstrap.min.js"></script>
+            <script src="/js/tabla/jquery.tablesorter.js"></script>
+            <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js" ></script>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" ></script>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js" ></script>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js" ></script>
+            <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js" ></script>
+            $extra
+        </body>
+        </html>
+        html;
         return $footer;
     }
 }
