@@ -3570,9 +3570,7 @@ class Ahorro extends Controller
             const imprimeExcel = () => exportaExcel("tblArqueos", "Reporte de arqueos de caja al " + getHoy(false))
              
             const mostrarModal = () => {
-                if (!validaHorarioOperacion("{$_SESSION['inicio']}", "{$_SESSION['fin']}", true)) {
-                    return showError("El horario de operación para arqueos de caja es de " + "{$_SESSION['inicio']}" + " a " + "{$_SESSION['fin']}")
-                }
+                validaHorarioOperacion()
                 document.querySelector("#frmModal").reset()
                 $("#modalArqueo").modal("show")
                 $("#fechaArqueo").val(getHoy())
@@ -3743,6 +3741,22 @@ class Ahorro extends Controller
                         tr.appendChild(td)
                     })
                     tbody.appendChild(tr)
+                })
+            }
+
+            const buscarArqueos = () => {
+                const datos = []
+                addParametro(datos, "fecha_inicio", document.querySelector("#fechaInicio").value)
+                addParametro(datos, "fecha_fin", document.querySelector("#fechaFin").value)
+
+                consultaServidor("/Ahorro/HistoricoArqueos/", $.param(datos), (respuesta) => {
+                    $("#tblArqueos").DataTable().destroy()
+                    if (!respuesta.success) {
+                        console.log(respuesta.error)
+                        return showError(respuesta.mensaje)
+                    }
+                    $("#tblArqueos tbody").html(respuesta.datos)
+                    configuraTabla("tblArqueos")
                 })
             }
         </script>

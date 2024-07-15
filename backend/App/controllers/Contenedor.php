@@ -6,8 +6,8 @@ defined("APPPATH") or die("Access denied");
 
 use \Core\Controller;
 
-require_once dirname(__DIR__) . '/../public/librerias/mpdf/mpdf.php';
-require_once dirname(__DIR__) . '/../public/librerias/phpexcel/Classes/PHPExcel.php';
+require_once dirname(__DIR__) . '/libs/mpdf/mpdf.php';
+require_once dirname(__DIR__) . '/libs/phpexcel/Classes/PHPExcel.php';
 
 class Contenedor extends Controller
 {
@@ -72,9 +72,9 @@ class Contenedor extends Controller
                                     <img src="/img/profile_default.jpg" alt="..." class="img-circle profile_img">
                                 </div>
                                 <div class="profile_info">
-                                    <span><b>USUARIO:</b> {$usuario}</span>
+                                    <span><b>USUARIO: </b>{$usuario}</span>
                                     <br>
-                                    <span><b>PERFIL:</b> <span class="fa fa-key"></span> {$perfil}</span>
+                                    <span><b>PERFIL: </b><span class="fa fa-key"></span>{$perfil}</span>
                                 </div>
                             </div>
                             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
@@ -149,62 +149,58 @@ html;
 
         ) {
             $menu .= <<<html
-                    <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
-                   <li><a href="/Pagos/PagosRegistro/">Registro de Pagos Caja</a></li>
+                <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
+                <li><a href="/Pagos/PagosRegistro/">Registro de Pagos Caja</a></li>
 html;
         }
 
-
-
-
         if ($this->__perfil == 'ACALL') {
             $menu .= <<<html
-                    <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
-                   <li><a href="/Pagos/PagosConsultaUsuarios/">Consulta de Pagos Cliente</a></li>
+                <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
+                <li><a href="/Pagos/PagosConsultaUsuarios/">Consulta de Pagos Cliente</a></li>
 html;
         }
 
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CAJA' || $this->__perfil == 'GTOCA' || $this->__perfil == 'AMOCA' || $this->__perfil == 'OCOF' || $this->__perfil == 'CPAGO' || $this->__perfil == 'ACALL') {
             $menu .= <<<html
-                    <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
-                   <li><a href="/Pagos/PagosConsulta/">Consultar Pagos</a></li>
+                <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
+                <li><a href="/Pagos/PagosConsulta/">Consultar Pagos</a></li>
 html;
         }
         $menu .= <<<html
-                
-                  </ul>
-                </li>
+                </ul>
+            </li>
 html;
 
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'GARAN' || $this->__perfil == 'CAMAG') {
             $menu .= <<<html
-                <li><a><i class="fa fa-users"> </i>&nbsp; Creditos <span class="fa fa-chevron-down"></span></a>
-                 <ul class="nav child_menu">
+            <li><a><i class="fa fa-users"> </i>&nbsp; Creditos <span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
 html;
         }
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'GARAN') {
             $menu .= <<<html
-                 
-                   <li><a href="/Creditos/ControlGarantias/">Control de Garantías</a></li>
+            <li><a href="/Creditos/ControlGarantias/">Control de Garantías</a></li>
 html;
         }
+
         if ($this->__perfil == 'ADMIN') {
             $menu .= <<<html
-        <li><a href="/Promociones/Telarana/">Calculo Descuento Telaraña</a></li>
-        <li><a href="/Validaciones/RegistroTelarana/">Registro Telaraña</a></li>
-        <li><a href="/Creditos/ActualizaCredito/">Actualización de Créditos</a></li>
-        <li><a href="/Devengo/">Devengo Crédito</a></li>
+            <li><a href="/Promociones/Telarana/">Calculo Descuento Telaraña</a></li>
+            <li><a href="/Validaciones/RegistroTelarana/">Registro Telaraña</a></li>
+            <li><a href="/Creditos/ActualizaCredito/">Actualización de Créditos</a></li>
+            <li><a href="/Devengo/">Devengo Crédito</a></li>
 html;
         }
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CAMAG') {
             $menu .= <<<html
-                   <li><a href="/Creditos/CambioSucursal/">Cambio de Sucursal</a></li>
+            <li><a href="/Creditos/CambioSucursal/">Cambio de Sucursal</a></li>
 html;
         }
 
         $menu .= <<<html
-                  </ul>
-                </li>
+            </ul>
+        </li>
 html;
 
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CALLC'  || $this->__perfil == 'ACALL') {
@@ -256,32 +252,32 @@ html;
 
         if ($this->__perfil == 'ADMIN'  || $this->__usuario == 'MCDP') {
             $menu .= <<<html
-                        <li><a href="/Cultiva/ReingresarClientesCredito/">Reingresar Clientes a Grupo</a></li>
+            <li><a href="/Cultiva/ReingresarClientesCredito/">Reingresar Clientes a Grupo</a></li>
 html;
         }
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLMV' || $this->__usuario == 'MCDP') {
             $menu .= <<<html
-                  </ul>
+                    </ul>
                 </li>
-        </ul>
+            </ul>
 html;
         }
 
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLMV' || $this->__usuario == 'PHEE') {
             $menu .= <<<html
-        <ul class="nav side-menu">
-            <li>
-                <a><i class="glyphicon glyphicon glyphicon-cog"> 
-            </i>&nbsp;Incidencias MCM<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                    <li><a href="/Incidencias/AutorizaRechazaSolicitud/">Error Autorizar y/o Rechazar Solicitud</a></li>
-                    <li><a href="/Incidencias/CalculoDevengo/">Calculo de Devengos</a></li>
-                    <li><a href="/Incidencias/CancelarRefinanciamiento/">Cancelar Refinanciamiento</a></li>
-                    <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Cambio de Fecha para Pagos No conciliados del día</a></li>
-                    <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Telaraña agregar referencias</a></li>
-                </ul>
-            </li>
-        </ul>
+            <ul class="nav side-menu">
+                <li>
+                    <a><i class="glyphicon glyphicon glyphicon-cog"> 
+                </i>&nbsp;Incidencias MCM<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="/Incidencias/AutorizaRechazaSolicitud/">Error Autorizar y/o Rechazar Solicitud</a></li>
+                        <li><a href="/Incidencias/CalculoDevengo/">Calculo de Devengos</a></li>
+                        <li><a href="/Incidencias/CancelarRefinanciamiento/">Cancelar Refinanciamiento</a></li>
+                        <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Cambio de Fecha para Pagos No conciliados del día</a></li>
+                        <li><a href="/Incidencias/ActualizarFechaPagosNoConciliados/">Telaraña agregar referencias</a></li>
+                    </ul>
+                </li>
+            </ul>
 html;
         }
 

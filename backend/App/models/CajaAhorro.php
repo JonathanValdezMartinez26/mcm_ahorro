@@ -2740,7 +2740,6 @@ sql;
                     CO
                 WHERE
                     CO.CODIGO = AR.CDG_SUCURSAL
-            
             ) AS SUCURSAL,
             AR.MONTO
         FROM
@@ -2826,32 +2825,32 @@ sql;
         FROM
             (
                 SELECT
-                CDG_ARQUEO,
-                CDG_USUARIO,
-                (SELECT CONCATENA_NOMBRE(PE.NOMBRE1, PE.NOMBRE2, PE.PRIMAPE, PE.SEGAPE) FROM PE WHERE PE.CODIGO = ARQUEO.CDG_USUARIO AND PE.CDGEM = 'EMPFIN') AS USUARIO,
-                CDG_SUCURSAL,
-                (SELECT NOMBRE FROM CO WHERE CODIGO = ARQUEO.CDG_SUCURSAL) AS SUCURSAL,
-                TO_CHAR(FECHA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA,
-                MONTO,
-                B_1000,
-                B_500,
-                B_200,
-                B_100,
-                B_50,
-                B_20,
-                M_10,
-                M_5,
-                M_2,
-                M_1,
-                M_050,
-                M_020,
-                M_010
+                AR.CDG_ARQUEO,
+                AR.CDG_USUARIO,
+                (SELECT CONCATENA_NOMBRE(PE.NOMBRE1, PE.NOMBRE2, PE.PRIMAPE, PE.SEGAPE) FROM PE WHERE PE.CODIGO = AR.CDG_USUARIO AND PE.CDGEM = 'EMPFIN') AS USUARIO,
+                AR.CDG_SUCURSAL,
+                (SELECT NOMBRE FROM CO WHERE CODIGO = AR.CDG_SUCURSAL) AS SUCURSAL,
+                TO_CHAR(AR.FECHA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA,
+                AR.MONTO,
+                AR.B_1000,
+                AR.B_500,
+                AR.B_200,
+                AR.B_100,
+                AR.B_50,
+                AR.B_20,
+                AR.M_10,
+                AR.M_5,
+                AR.M_2,
+                AR.M_1,
+                AR.M_050,
+                AR.M_020,
+                AR.M_010
                 FROM
-                    ARQUEO
+                    ARQUEO AR
                 WHERE
-                    CDG_SUCURSAL = '{$datos['sucursal']}'
+                    AR.CDG_SUCURSAL = '028'
                 ORDER BY
-                    FECHA DESC
+                    AR.FECHA DESC
             )
         sql;
 
