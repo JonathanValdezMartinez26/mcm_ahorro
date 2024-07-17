@@ -1,39 +1,17 @@
 <?php
 
-namespace App\controllers;
+namespace Jobs\controllers;
 
-include 'C:/xampp/htdocs/mcm/backend/App/models/JobsCredito.php';
+include_once dirname(__DIR__) . "\models\JobsCredito.php";
 
-use \App\models\JobsCredito as JobsDao;
-use DateTime;
-use DateTimeZone;
+use Core\Job;
+use Jobs\models\JobsCredito as JobsDao;
 
-$validaHV = new DateTime('now', new DateTimeZone('America/Mexico_City'));
-if ($validaHV->format('I')) date_default_timezone_set('America/Mazatlan');
-else date_default_timezone_set('America/Mexico_City');
-
-$jobs = new JobsCredito();
-$jobs->JobCheques();
-// $jobs->ReInserta("C:\Users\Alberto\Desktop\prueba.json");
-
-class JobsCredito
+class JobsCredito extends Job
 {
-    public function SaveLog($tdatos)
+    public function __construct()
     {
-        $archivo = "C:/xampp/JobsCredito.log";
-
-        clearstatcache();
-        if (file_exists($archivo) && filesize($archivo) > 10 * 1024 * 1024) { // 10 MB
-            $nuevoNombre = "C:/xampp/JobsCredito" . date('Ymd') . ".log";
-            rename($archivo, $nuevoNombre);
-        }
-
-        $log = fopen($archivo, "a");
-
-        $infoReg = date("Y-m-d H:i:s") . " - job_fnc: " . debug_backtrace()[1]['function'] . " -> " . $tdatos;
-
-        fwrite($log, $infoReg . PHP_EOL);
-        fclose($log);
+        parent::__construct("JobsCredito");
     }
 
     public function JobCheques()
@@ -116,3 +94,7 @@ class JobsCredito
         echo "ReInserta finalizado";
     }
 }
+
+$jobs = new JobsCredito();
+$jobs->JobCheques();
+// $jobs->ReInserta("C:\Users\Alberto\Desktop\prueba.json");

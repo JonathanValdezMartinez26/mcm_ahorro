@@ -13,7 +13,7 @@ class Reportes
     public static function ConsultaUsuariosSICAFINMCM()
     {
 
-        $mysqli = Database::getInstance();
+        $mysqli = new Database();
         $query = <<<sql
         SELECT
             *

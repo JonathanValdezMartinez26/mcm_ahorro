@@ -1,80 +1,18 @@
 <?PHP
 
-namespace App\controllers;
+namespace Jobs\controllers;
 
-include 'C:/xampp/htdocs/mcm/backend/App/models/JobsAhorro.php';
+include_once dirname(__DIR__) . "\..\Core\Job.php";
+include_once dirname(__DIR__) . "\models\JobsAhorro.php";
 
-use \App\models\JobsAhorro as JobsDao;
-use DateTime;
-use DateTimeZone;
+use Core\Job;
+use Jobs\models\JobsAhorro as JobsDao;
 
-$validaHV = new DateTime('now', new DateTimeZone('America/Mexico_City'));
-if ($validaHV->format('I')) date_default_timezone_set('America/Mazatlan');
-else date_default_timezone_set('America/Mexico_City');
-
-$jobs = new JobsAhorro();
-
-if (isset($argv[1])) {
-    switch ($argv[1]) {
-        case 'SucursalesSinArqueo':
-            // Programar a las 5:20 pm, de lunes a viernes
-            $jobs->SucursalesSinArqueo();
-            break;
-        case 'CapturaSaldosSucursales':
-            // Programas a las 5:22 pm, de lunes a viernes
-            $jobs->CapturaSaldosSucursales();
-            break;
-        case 'RechazaSolicitudesSinAtender':
-            // Programar a las 5:25 pm, de lunes a viernes
-            $jobs->RechazaSolicitudesSinAtender();
-            break;
-        case 'DevengoInteresAhorroDiario':
-            // Programar a las 6:00 pm, todos los días
-            $jobs->DevengoInteresAhorroDiario();
-            break;
-        case 'LiquidaInversion':
-            // Programar 11:50 pm, todos los dias
-            $jobs->LiquidaInversion();
-            break;
-        case 'ComprobacionDevengoAhorro':
-            $jobs->ComprobacionDevengoAhorro();
-            break;
-        case 'prueba_horario':
-            echo date("Y-m-d H:i:s") . "\n";
-            break;
-        case 'help':
-            echo "Los jobs disponibles son: \n";
-            echo "SucursalesSinArqueo: Se recomienda se ejecute a las 5:20 pm, de lunes a viernes.\n";
-            echo "CapturaSaldosSucursales: Se recomienda se ejecute a las 5:22 pm, de lunes a viernes.\n";
-            echo "DevengoInteresAhorroDiario: Se recomienda se ejecute a las 6:00 pm, todos los días.\n";
-            echo "RechazaSolicitudesSinAtender: Se recomienda se ejecute a las 5:25 pm, de lunes a viernes.\n";
-            echo "LiquidaInversion: Se recomienda se ejecute a las 11:50 pm, todos los días.\n";
-            echo "ComprobacionDevengoAhorro: Se plica de forma manual unicamente cuando se requiera validar los intereses devengados.\n";
-            break;
-        default:
-            echo "No se encontró el job solicitado.\nEjecute 'php JobsAhorro.php help' para ver los jobs disponibles.\n";
-            break;
-    }
-} else echo "Debe especificar el job a ejecutar.\nEjecute 'php JobsAhorro.php help' para ver los jobs disponibles.\n";
-
-class JobsAhorro
+class JobsAhorro extends Job
 {
-    public function SaveLog($tdatos)
+    public function __construct()
     {
-        $archivo = "C:/xampp/JobsAhorro.log";
-
-        clearstatcache();
-        if (file_exists($archivo) && filesize($archivo) > 10 * 1024 * 1024) { // 10 MB
-            $nuevoNombre = "C:/xampp/JobsAhorro" . date('Ymd') . ".log";
-            rename($archivo, $nuevoNombre);
-        }
-
-        $log = fopen($archivo, "a");
-
-        $infoReg = date("Y-m-d H:i:s") . " - job_fnc: " . debug_backtrace()[1]['function'] . " -> " . $tdatos;
-
-        fwrite($log, $infoReg . PHP_EOL);
-        fclose($log);
+        parent::__construct("JobsAhorro");
     }
 
     public function DevengoInteresAhorroDiario()
@@ -88,7 +26,7 @@ class JobsAhorro
         foreach ($cuentas["datos"] as $key => $cuenta) {
             $saldo = $cuenta["SALDO"];
             $tasa = $cuenta["TASA"] / 100;
-            $devengo = $saldo * ($tasa / 365);
+            $devengo = $saldo * ($tasa / 360);
 
             $datos = [
                 "cliente" => $cuenta["CLIENTE"],
@@ -204,6 +142,8 @@ class JobsAhorro
 
     public function CapturaSaldosSucursales()
     {
+        if (date("H:i:s") < "17:30:00") return self::SaveLog("No se puede ejecutar la captura de saldos antes de las 5:30 pm.");
+
         self::SaveLog("Inicio -> Captura de Saldos de Sucursales");
         $resumen = [];
         $sucursales = JobsDao::GetSucursales();
@@ -261,3 +201,48 @@ class JobsAhorro
         self::SaveLog("Finalizado -> Comprobación de Devengo Ahorro");
     }
 }
+
+if (isset($argv[1])) {
+    $jobs = new JobsAhorro();
+
+    switch ($argv[1]) {
+        case 'SucursalesSinArqueo':
+            // Programar a las 5:20 pm, de lunes a viernes
+            $jobs->SucursalesSinArqueo();
+            break;
+        case 'CapturaSaldosSucursales':
+            // Programas a las 5:22 pm, de lunes a viernes
+            $jobs->CapturaSaldosSucursales();
+            break;
+        case 'RechazaSolicitudesSinAtender':
+            // Programar a las 5:25 pm, de lunes a viernes
+            $jobs->RechazaSolicitudesSinAtender();
+            break;
+        case 'DevengoInteresAhorroDiario':
+            // Programar a las 6:00 pm, todos los días
+            $jobs->DevengoInteresAhorroDiario();
+            break;
+        case 'LiquidaInversion':
+            // Programar 11:50 pm, todos los dias
+            $jobs->LiquidaInversion();
+            break;
+        case 'ComprobacionDevengoAhorro':
+            $jobs->ComprobacionDevengoAhorro();
+            break;
+        case 'prueba_horario':
+            echo date("Y-m-d H:i:s") . "\n";
+            break;
+        case 'help':
+            echo "Los jobs disponibles son: \n";
+            echo "SucursalesSinArqueo: Se recomienda se ejecute a las 5:20 pm, de lunes a viernes.\n";
+            echo "CapturaSaldosSucursales: Se recomienda se ejecute a las 5:22 pm, de lunes a viernes.\n";
+            echo "DevengoInteresAhorroDiario: Se recomienda se ejecute a las 6:00 pm, todos los días.\n";
+            echo "RechazaSolicitudesSinAtender: Se recomienda se ejecute a las 5:25 pm, de lunes a viernes.\n";
+            echo "LiquidaInversion: Se recomienda se ejecute a las 11:50 pm, todos los días.\n";
+            echo "ComprobacionDevengoAhorro: Se plica de forma manual unicamente cuando se requiera validar los intereses devengados.\n";
+            break;
+        default:
+            echo "No se encontró el job solicitado.\nEjecute 'php JobsAhorro.php help' para ver los jobs disponibles.\n";
+            break;
+    }
+} else echo "Debe especificar el job a ejecutar.\nEjecute 'php JobsAhorro.php help' para ver los jobs disponibles.\n";
