@@ -806,6 +806,7 @@ html;
             swal({
                 title: "Procesando Pagos",
                 text: "Espere por favor...",
+                buttons: false,
                 onOpen: function() {
                     swal.showLoading()
                 }
