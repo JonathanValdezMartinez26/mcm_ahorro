@@ -579,323 +579,251 @@ html;
         $extraHeader = <<<html
         <title>Corte de Pagos App</title>
         <link rel="shortcut icon" href="/img/logo.png">
-html;
+        html;
 
 
         $extraFooter = <<<html
-      <script>
-      
-       $(document).ready(function(){
-            $("#muestra-cupones").tablesorter();
-          var oTable = $('#muestra-cupones').DataTable({
-           "lengthMenu": [
+        <script>
+        $(document).ready(function () {
+            $("#muestra-cupones").tablesorter()
+            var oTable = $("#muestra-cupones").DataTable({
+                lengthMenu: [
                     [30, 50, -1],
-                    [30, 50, 'Todos'],
+                    [30, 50, "Todos"]
                 ],
-                "columnDefs": [{
-                    "orderable": false,
-                    "targets": 0
-                }],
-                 "order": false
-            });
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets: 0
+                    }
+                ],
+                order: false
+            })
             // Remove accented character from search input as well
-            $('#muestra-cupones input[type=search]').keyup( function () {
-                var table = $('#example').DataTable();
-                table.search(
-                    jQuery.fn.DataTable.ext.type.search.html(this.value)
-                ).draw();
-            });
-            var checkAll = 0;
-            
-        });
-       
-        function enviar_add_horario(){	
-             sucursal = document.getElementById("sucursal").value; 
-             
-            if(sucursal == '')
-                {
-                    
-                      swal("Atención", "Ingrese un monto mayor a $0", "warning");
-                      document.getElementById("monto").focus();
-                        
-                }
-            else
-                {
-                    
-                    $.ajax({
-                    type: 'POST',
-                    url: '/Pagos/HorariosAdd/',
-                    data: $('#Add_AHC').serialize(),
-                    success: function(respuesta) {
-                         if(respuesta=='1'){
-                      
-                         swal("Registro guardado exitosamente", {
-                                      icon: "success",
-                                    });
-                        location.reload();
-                        }
-                        else {
-                         swal(respuesta, {
-                                      icon: "error",
-                                    });
-                         //location.reload();
-                         
-                        }
-                    }
-                    });
-                }
-    }
-    
-        function enviar_update_horario(){	
-          
-                    $.ajax({
-                    type: 'POST',
-                    url: '/Pagos/HorariosUpdate/',
-                    data: $('#Update_AHC').serialize(),
-                    success: function(respuesta) {
-                         if(respuesta=='1'){
-                      
-                         swal("Registro actualizado exitosamente", {
-                                      icon: "success",
-                                    });
-                        location.reload();
-                        }
-                        else {
-                         swal(respuesta, {
-                                      icon: "error",
-                                    });
-                         //location.reload();
-                         
-                        }
-                    }
-                    });
-    }
-    
-        function editar_pago(id, comentario, tipo, monto, nuevo_monto, incidencia)
-        {
-                 let USDollar = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            });
+            $("#muestra-cupones input[type=search]").keyup(function () {
+                var table = $("#example").DataTable()
+                table.search(jQuery.fn.DataTable.ext.type.search.html(this.value)).draw()
+            })
+            var checkAll = 0
+        })
 
-                 if(incidencia == 1)
-                     {
-                         document.getElementById("nuevo_monto").value = nuevo_monto;
-                     }
-                 else 
-                     {
-                         document.getElementById("nuevo_monto").value = monto;
-                     }
-                document.getElementById("monto_detalle").value = USDollar.format(monto);
-                document.getElementById("comentario_detalle").value = comentario;
-                document.getElementById("id_registro").value = id;
-        
-                 select = document.querySelector('#tipo_pago_detalle');
-                 select.value = tipo;
-        
-                $('#modal_agregar_horario').modal('show');
-        }
-        
-        function enviar_add_edit_app(){	
-             nuevo_monto = document.getElementById("nuevo_monto").value; 
-             
-            if(nuevo_monto == '')
-                {
-                    if(nuevo_monto == 0)
-                        {
-                             swal("Atención", "Ingrese un monto mayor a $0", "warning");
-                             document.getElementById("monto").focus();
-                             
+        function enviar_add_horario() {
+            sucursal = document.getElementById("sucursal").value
+            if (sucursal == "") {
+                swal("Atención", "Ingrese un monto mayor a $0", "warning")
+                document.getElementById("monto").focus()
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Pagos/HorariosAdd/",
+                    data: $("#Add_AHC").serialize(),
+                    success: function (respuesta) {
+                        if (respuesta == "1") {
+                            swal("Registro guardado exitosamente", {
+                                icon: "success"
+                            })
+                            location.reload()
+                        } else {
+                            swal(respuesta, {
+                                icon: "error"
+                            })
+                            //location.reload();
                         }
+                    }
+                })
+            }
+        }
+
+        function enviar_update_horario() {
+            $.ajax({
+                type: "POST",
+                url: "/Pagos/HorariosUpdate/",
+                data: $("#Update_AHC").serialize(),
+                success: function (respuesta) {
+                    if (respuesta == "1") {
+                        swal("Registro actualizado exitosamente", {
+                            icon: "success"
+                        })
+                        location.reload()
+                    } else {
+                        swal(respuesta, {
+                            icon: "error"
+                        })
+                        //location.reload();
+                    }
                 }
-            else
-                {
+            })
+        }
+
+        function editar_pago(id, comentario, tipo, monto, nuevo_monto, incidencia) {
+            let USDollar = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD"
+            })
+
+            if (incidencia == 1) {
+                document.getElementById("nuevo_monto").value = nuevo_monto
+            } else {
+                document.getElementById("nuevo_monto").value = monto
+            }
+            document.getElementById("monto_detalle").value = USDollar.format(monto)
+            document.getElementById("comentario_detalle").value = comentario
+            document.getElementById("id_registro").value = id
+
+            select = document.querySelector("#tipo_pago_detalle")
+            select.value = tipo
+
+            $("#modal_agregar_horario").modal("show")
+        }
+
+        function enviar_add_edit_app() {
+            nuevo_monto = document.getElementById("nuevo_monto").value
+
+            if (nuevo_monto == "") {
+                if (nuevo_monto == 0) {
+                    swal("Atención", "Ingrese un monto mayor a $0", "warning")
+                    document.getElementById("monto").focus()
+                }
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Pagos/PagosEditApp/",
+                    data: $("#Add_Edit_Pago").serialize(),
+                    success: function (respuesta) {
+                        if (respuesta == "1") {
+                            document.getElementById("nuevo_monto").value = ""
+
+                            swal("Registro editado exitosamente", {
+                                icon: "success"
+                            })
+                            location.reload()
+                        } else {
+                            $("#modal_agregar_pago").modal("hide")
+                            swal(respuesta, {
+                                icon: "error"
+                            })
+                            document.getElementById("monto").value = ""
+                        }
+                    }
+                })
+            }
+        }
+
+        function check_pagos(id) {
+            var checkbox = document.getElementById(id)
+            var isChecked = document.getElementById(id).checked
+            if (isChecked == false) {
+                var returnVal = confirm("¿Estas seguro de que deseas desactivar esta casilla?")
+                if (returnVal == true) {
+                    estatus = 0
+                    //////////////////////////
                     $.ajax({
-                    type: 'POST',
-                    url: '/Pagos/PagosEditApp/',
-                    data: $('#Add_Edit_Pago').serialize(),
-                    success: function(respuesta) {
-                         if(respuesta=='1'){
-                      
-                        document.getElementById("nuevo_monto").value = "";
-                        
-                         swal("Registro editado exitosamente", {
-                                      icon: "success",
-                                    });
-                         location.reload();
-                         
-                        
-                        }
-                        else {
-                        $('#modal_agregar_pago').modal('hide')
-                         swal(respuesta, {
-                                      icon: "error",
-                                    });
-                            document.getElementById("monto").value = "";
-                        }
-                    }
-                    });
-                }
-    }
-        
-        function check_pagos(id)
-        {
-          
-            var checkbox = document.getElementById(id);
-            var isChecked = document.getElementById(id).checked;
-            if(isChecked == false)
-                {
-                    var returnVal = confirm("¿Estas seguro de que deseas desactivar esta casilla?");
-                    if(returnVal == true)
-                    {
-                        estatus = 0;
-                           //////////////////////////
-                           $.ajax({
-                            type: 'POST',
-                            url: '/Pagos/ValidaCorrectoPago/',
-                            data: 'estatus='+estatus+'&id_check='+id,
-                            success: function(respuesta) {
-                                 if(respuesta=='1'){
-                              
-                                 swal("Registro desactivado exitosamente", {
-                                              icon: "success",
-                                            });
-                                location.reload();
-                                return false;
-                                }
-                                else {
-                                 swal(respuesta, {
-                                              icon: "error",
-                                            });
-                                 location.reload();
-                                }
+                        type: "POST",
+                        url: "/Pagos/ValidaCorrectoPago/",
+                        data: "estatus=" + estatus + "&id_check=" + id,
+                        success: function (respuesta) {
+                            if (respuesta == "1") {
+                                swal("Registro desactivado exitosamente", {
+                                    icon: "success"
+                                })
+                                location.reload()
+                                return false
+                            } else {
+                                swal(respuesta, {
+                                    icon: "error"
+                                })
+                                location.reload()
                             }
-                            });
-                           //////////////////////////
-                        return false;
-                    }
-                    else 
-                    {
-                       alert("No paso nada");
-                       return false;
-                    }
+                        }
+                    })
+                    //////////////////////////
+                    return false
+                } else {
+                    alert("No paso nada")
+                    return false
                 }
-                else 
-                {
-                   var returnVal = confirm("Estas seguro de Calcular?");
-                   if(returnVal == true)
-                       {
-                           estatus = 1;
-                           //////////////////////////
-                           $.ajax({
-                            type: 'POST',
-                            url: '/Pagos/ValidaCorrectoPago/',
-                            data: 'estatus='+estatus+'&id_check='+id,
-                            success: function(respuesta) {
-                                 if(respuesta=='1'){
-                              
-                                 swal("Registro actualizado exitosamente", {
-                                              icon: "success",
-                                            });
-                                location.reload();
+            } else {
+                var returnVal = confirm("Estas seguro de Calcular?")
+                if (returnVal == true) {
+                    estatus = 1
+                    //////////////////////////
+                    $.ajax({
+                        type: "POST",
+                        url: "/Pagos/ValidaCorrectoPago/",
+                        data: "estatus=" + estatus + "&id_check=" + id,
+                        success: function (respuesta) {
+                            if (respuesta == "1") {
+                                swal("Registro actualizado exitosamente", {
+                                    icon: "success"
+                                })
+                                location.reload()
                                 //return false;
-                                }
-                                else {
-                                 swal(respuesta, {
-                                              icon: "error",
-                                            });
-                                 //location.reload();
-                                }
+                            } else {
+                                swal(respuesta, {
+                                    icon: "error"
+                                })
+                                //location.reload();
                             }
-                            });
-                           //////////////////////////
-                           
-                       }
-                   else 
-                       {
-                           document.getElementById(id).checked = false;
-                           return false;
-                       }
-                    }
-            
+                        }
+                    })
+                    //////////////////////////
+                } else {
+                    document.getElementById(id).checked = false
+                    return false
+                }
+            }
         }
-        
-         function boton_resumen_pago()
-        {
-             validados = document.getElementById("validados_r");
-             contenido_validados = validados.innerHTML;
-             
-             total = document.getElementById("total_r");
-             contenido_total = total.innerHTML;
-             
-             operacion = parseInt(contenido_total) - parseInt(contenido_validados);
-            
-           
-           
-           if(contenido_validados == contenido_total)
-               {
-                   $('#modal_resumen').modal({backdrop: 'static', keyboard: false}, 'show');
-               }
-           else 
-               {
-                    swal("Atención", "Debe validar todos los pagos (tiene " + operacion+ " registros pendientes)", "warning");
-               }
+
+        function boton_resumen_pago() {
+            validados = document.getElementById("validados_r")
+            contenido_validados = validados.innerHTML
+
+            total = document.getElementById("total_r")
+            contenido_total = total.innerHTML
+
+            operacion = parseInt(contenido_total) - parseInt(contenido_validados)
+
+            if (contenido_validados == contenido_total)
+                $("#modal_resumen").modal({ backdrop: "static", keyboard: false }, "show")
+            else
+                swal(
+                    "Atención",
+                    "Debe validar todos los pagos (tiene " + operacion + " registros pendientes)",
+                    "warning"
+                )
         }
-        
-         function boton_ticket(barcode)
-        {
-             $('#all').attr('action', '/Pagos/Ticket/'+barcode+'/');
-             $('#all').attr('target', '_blank');
-             $("#all").submit();
+
+        function boton_ticket(barcode) {
+            $("#all").attr("action", "/Pagos/Ticket/" + barcode + "/")
+            $("#all").attr("target", "_blank")
+            $("#all").submit()
         }
-        
-         function boton_terminar(barcode)
-        {
-            var resume_table = document.getElementById("terminar_resumen");
-            total = document.getElementById("validados_r_total");
-            sum_contador = 1;
-            contenido = parseInt(total.innerHTML) + 1;
+
+        function boton_terminar(barcode) {
+            let tabla = document.querySelector("#terminar_resumen").querySelector("tbody")
+            let filas = tabla.querySelectorAll("tr")
             
-            for (var i = 1, row; row = resume_table.rows[i]; i++) {
-                
-              sum_contador++;
-              
-                    col = row.cells[0];
-                    pk = col.innerText;
-                  
+            swal({
+                title: "Procesando Pagos",
+                text: "Espere por favor...",
+                onOpen: function() {
+                    swal.showLoading()
+                }
+            })
+
+            Array.from(filas).forEach((fila) => {
+                pk = fila.cells[0].innerText
                 $.ajax({
                     type: 'POST',
                     url: '/Pagos/PagosAddApp/',
-                    data: 'cortecaja_pk='+pk+'&barcode='+barcode,
-                    success: function(respuesta) {
-                                swal({
-                                    title: "Procesando Pagos",
-                                    text: "Espere por favor...",
-                                    timer: 100,
-                                    onOpen: function() {
-                                        swal.showLoading()
-                                    }
-                                })
-                        }
-                    });
-                
-                 if(contenido == sum_contador)
-                     {
-                         //alert("Son iguales");
-                         location.reload();
-                     }
-                 else
-                     {
-                         //alert("No son iguales");
-                     }
-               
-            }
-          
+                    data: 'cortecaja_pk='+pk+'&barcode='+barcode
+                })
+            })
+
+            location.reload()
         }
-       
-      
-      </script>
-html;
+        </script>
+        html;
 
         $tabla = '';
 

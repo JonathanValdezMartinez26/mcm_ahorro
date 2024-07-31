@@ -3,10 +3,10 @@
 namespace Jobs\models;
 
 include_once dirname(__DIR__) . "\..\Core\Model.php";
-include_once dirname(__DIR__) . "\Core\Database.php";
+include_once dirname(__DIR__) . "\..\Core\Database_jobs.php";
 
 use Core\Model;
-use \Core\Database;
+use Core\Database;
 
 class JobsCredito extends Model
 {
