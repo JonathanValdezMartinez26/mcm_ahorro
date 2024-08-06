@@ -2836,7 +2836,7 @@ sql;
                 FROM
                     ARQUEO AR
                 WHERE
-                    AR.CDG_SUCURSAL = '028'
+                    AR.CDG_SUCURSAL = '{$datos['sucursal']}'
                 ORDER BY
                     AR.FECHA DESC
             )
