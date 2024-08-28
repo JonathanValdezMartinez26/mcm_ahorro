@@ -28,7 +28,7 @@ class CajaAhorro
     {
         $qry = <<<sql
         SELECT
-            SUC_ESTADO_AHORRO.CDG_SUCURSAL AS CDGCO_AHORRO,
+            SUC_ESTADO_AHORRO.CDG_SUCURSAL AS CDGCO_AHORRO
         FROM
             SUC_CAJERA_AHORRO
         INNER JOIN

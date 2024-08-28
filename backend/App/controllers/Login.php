@@ -10,30 +10,31 @@ use \App\models\Login as LoginDao;
 
 class Login
 {
-    function __construct()
-    {
-    }
+    function __construct() {}
 
     public function index()
     {
-        $extraHeader = <<<html
+        $extraHeader = <<<HTML
             <link rel="stylesheet" href="/css/bootstrap/bootstrap.css">
             <link rel="stylesheet" href="/css/bootstrap/datatables.bootstrap.css">
             <link rel="stylesheet" href="/css/contenido/custom.min.css">
             <link rel="stylesheet" href="/css/validate/screen.css">
-        html;
+        HTML;
 
-        $extraFooter = <<<html
+        $extraFooter = <<<HTML
             <script src="/js/jquery.min.js"></script>
             <script src="/js/validate/jquery.validate.js"></script>
             <script>
                 document.getElementById("usuario").focus()
+                
                 function enviar_formulario() {
                     $("#btnEntrar").click()
                 }
+
                 function mayus(e) {
                     e.value = e.value.toUpperCase()
                 }
+
                 $(document).ready(function () {
                     $.validator.addMethod(
                         "checkUserName",
@@ -64,6 +65,7 @@ class Login
                         },
                         "El usuario no es correcto, o no tiene acceso al sistema, verifique. "
                     )
+
                     $("#login").validate({
                         rules: {
                             usuario: {
@@ -83,6 +85,7 @@ class Login
                             }
                         }
                     })
+
                     $("#btnEntrar").click(function () {
                         $.ajax({
                             type: "POST",
@@ -103,14 +106,14 @@ class Login
                                         $("#login").submit()
                                     } else {
                                         swal(
-                                            "Error de autenticación ",
+                                            "Error de autenticación",
                                             "El usuario o contraseña son incorrectos, consulte al administrador",
                                             "error"
                                         )
                                     }
                                 } else {
                                     swal(
-                                        "Error de autenticación ",
+                                        "Error de autenticación",
                                         "El usuario o contraseña son incorrectos, consulte al administrador",
                                         "error"
                                     )
@@ -120,7 +123,8 @@ class Login
                     })
                 })
             </script>
-        html;
+        HTML;
+
         View::set('header', $extraHeader);
         View::set('footer', $extraFooter);
         View::render("login");

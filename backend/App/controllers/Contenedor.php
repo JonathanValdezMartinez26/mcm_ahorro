@@ -48,9 +48,7 @@ class Contenedor extends Controller
             <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.css">
             <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap-switch.css">
             <link rel="stylesheet" type="text/css" href="/css/validate/screen.css">
-            <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.min.css">
             <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
-            <link rel="stylesheet" type="text/css" href="/css/menu/menu5custom.min.css">
             <link rel="stylesheet" type="text/css" href="/css/green.css">
             <link rel="stylesheet" type="text/css" href="/css/custom.min.css">
             $extra 
@@ -81,6 +79,7 @@ class Contenedor extends Controller
                                 <div class="menu_section">
         html;
 
+        $menu = "";
 
         if ($permiso_ahorro == '1' || $this->__usuario == 'LGFR' || $this->__usuario == 'PAES' || $this->__usuario == 'PMAB' || $this->__usuario == 'AMGM' || $this->__usuario == 'DCRI' || $this->__usuario == 'GUGJ' || $this->__usuario == 'JUSA' || $this->__usuario == 'HEDC') {
             $menu .= <<<html
@@ -94,7 +93,6 @@ html;
         if ($permiso_ahorro == '1' || $this->__usuario == 'AMGM') {
             $menu .= <<<html
                 <li><a href="/Ahorro/CuentaCorriente/"><i class="glyphicon glyphicon-usd"> </i>&nbsp; Mi espacio </a> </li>
-        
 html;
         }
 
@@ -102,7 +100,6 @@ html;
             $menu .= <<<html
                 <li><a href="/AdminSucursales/SaldosDiarios/"><i class="glyphicon glyphicon-paste"> </i>&nbsp; Admin Sucursales </a> </li>
              </ul>
-          
 html;
         }
 
@@ -111,6 +108,7 @@ html;
               <h3>GENERAL </h3>
               <ul class="nav side-menu">       
 html;
+
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CAJA' || $this->__perfil == 'GTOCA' || $this->__perfil == 'AMOCA' || $this->__perfil == 'OCOF' || $this->__perfil == 'CPAGO' || $this->__perfil == 'ACALL' || $this->__perfil == 'LAYOU' || $this->__usuario == 'TESP' || $this->__usuario == 'MGJC') {
 
             $menu .= <<<html
@@ -118,17 +116,20 @@ html;
                   <ul class="nav child_menu">
 html;
         }
+
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'LGFR' || $this->__usuario == 'MGJC') {
             $menu .= <<<html
             <li><a href="/Pagos/">Administración Pagos</a></li>
 html;
         }
+
         if ($this->__perfil == 'ADMIN') {
             $menu .= <<<html
             <li><a href="/Pagos/CorteEjecutivo/">Recepción Pagos App</a></li> 
             <li><a href="/Pagos/CorteEjecutivoReimprimir/">Reimprimir Recibos App</a></li> 
 html;
         }
+
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'ACALL' || $this->__perfil == 'LAYOU') {
             $menu .= <<<html
             <li><a href="/Pagos/Layout/">Layout Contable</a></li> 
@@ -146,27 +147,24 @@ html;
             || $this->__usuario == 'DAGC' //DANIELA
             || $this->__usuario == 'COVG' //USUARIO GABRIELA VELAZQUEZ
             || $this->__usuario == 'TESP'
-
         ) {
             $menu .= <<<html
-                <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
                 <li><a href="/Pagos/PagosRegistro/">Registro de Pagos Caja</a></li>
 html;
         }
 
         if ($this->__perfil == 'ACALL') {
             $menu .= <<<html
-                <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
                 <li><a href="/Pagos/PagosConsultaUsuarios/">Consulta de Pagos Cliente</a></li>
 html;
         }
 
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CAJA' || $this->__perfil == 'GTOCA' || $this->__perfil == 'AMOCA' || $this->__perfil == 'OCOF' || $this->__perfil == 'CPAGO' || $this->__perfil == 'ACALL') {
             $menu .= <<<html
-                <!-- <li><a href="/Pagos/CorteCaja/">Corte Caja Pagos</a></li>-->
                 <li><a href="/Pagos/PagosConsulta/">Consultar Pagos</a></li>
 html;
         }
+
         $menu .= <<<html
                 </ul>
             </li>
@@ -210,7 +208,7 @@ html;
                  <ul class="nav child_menu">
 html;
         }
-        $fechaActual = date('Y-m-d');
+
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'ACALL' || $this->__usuario == 'ESMM' || $this->__usuario == 'HSEJ') {
             $menu .= <<<html
                     <li><a href="/CallCenter/Administracion/">Asignar Sucursales</a></li>
@@ -219,6 +217,7 @@ html;
                     <li><a href="/CallCenter/Busqueda/">Búsqueda Rápida</a></li>
 html;
         }
+
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CALLC' || $this->__perfil == 'ACALL' || $this->__usuario == 'HSEJ') {
             if ($this->__perfil == 'ADMIN' || $this->__usuario == 'HSEJ') {
                 $titulo = "(Analistas)";
@@ -255,6 +254,7 @@ html;
             <li><a href="/Cultiva/ReingresarClientesCredito/">Reingresar Clientes a Grupo</a></li>
 html;
         }
+
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'PLMV' || $this->__usuario == 'MCDP') {
             $menu .= <<<html
                     </ul>
@@ -284,8 +284,8 @@ html;
         if ($this->__perfil == 'ADMIN' || $this->__usuario == 'MAPH' || $this->__usuario == 'HSEJ' || $this->__usuario == 'ORHM' || $this->__usuario == 'LGFR') {
             $menu .= <<<html
               <ul class="nav side-menu">
-                
 html;
+
             if ($this->__perfil == 'ADMIN' || $this->__usuario == 'LGFR') {
                 $menu .= <<<html
                 <li><a><i class="glyphicon glyphicon glyphicon-cog"> </i>&nbsp; Administrar Caja <span class="fa fa-chevron-down"></span></a>
@@ -321,7 +321,7 @@ html;
 html;
         }
 
-    $menu .= <<<html
+        $menu .= <<<html
                         </div>
                     </div>
                 </div>
@@ -354,7 +354,7 @@ html;
 
     public function footer($extra = '')
     {
-        $footer = <<<html
+        $footer = <<<HTML
             </div>
             <script src="/js/moment/moment.min.js"></script>
             <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -376,7 +376,7 @@ html;
             $extra
         </body>
         </html>
-        html;
+        HTML;
         return $footer;
     }
 }

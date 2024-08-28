@@ -8,7 +8,6 @@ use \App\models\General as GeneralDao;
 
 class Controller
 {
-
     public $__usuario = '';
     public $__nombre = '';
     public $__puesto = '';

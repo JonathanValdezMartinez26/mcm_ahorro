@@ -205,7 +205,7 @@ class Ahorro extends Controller
             plantilla += '<head>'
             plantilla += '<meta charset="UTF-8">'
             plantilla += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-            plantilla += '<link rel="shortcut icon" href="" + host + "/img/logo.png">'
+            plantilla += '<link rel="shortcut icon" href="' + host + '/img/logo_ico.png">'
             plantilla += '<title>' + titulo + '</title>'
             plantilla += '</head>'
             plantilla += '<body style="margin: 0; padding: 0; background-color: #333333;">'
@@ -3570,7 +3570,7 @@ class Ahorro extends Controller
             const imprimeExcel = () => exportaExcel("tblArqueos", "Reporte de arqueos de caja al " + getHoy(false))
              
             const mostrarModal = () => {
-                validaHorarioOperacion()
+                validaHorarioOperacion("{$_SESSION['inicio']}", "{$_SESSION['fin']}")
                 document.querySelector("#frmModal").reset()
                 $("#modalArqueo").modal("show")
                 $("#fechaArqueo").val(getHoy())
