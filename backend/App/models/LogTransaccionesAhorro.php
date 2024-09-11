@@ -5,7 +5,6 @@ namespace App\models;
 defined("APPPATH") or die("Access denied");
 
 use \Core\Database;
-use Exception;
 
 class LogTransaccionesAhorro
 {
@@ -57,7 +56,7 @@ class LogTransaccionesAhorro
             $db = new Database();
             $db->insertar($qry, $parametros);
             return [$qry, $parametros];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }

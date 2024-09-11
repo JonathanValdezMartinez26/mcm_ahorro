@@ -2,11 +2,13 @@
 
 namespace Jobs\models;
 
+include_once dirname(__DIR__) . "\..\Core\App.php";
 include_once dirname(__DIR__) . "\..\Core\Model.php";
-include_once dirname(__DIR__) . "\..\Core\Database_jobs.php";
+include_once dirname(__DIR__) . "\..\Core\Database.php";
 
 use Core\Model;
 use Core\Database;
+use Core\App;
 use Exception;
 
 class JobsAhorro extends Model
@@ -27,7 +29,8 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $res = $db->queryAll($qry);
             return self::Responde(true, "Créditos activos obtenidos correctamente", $res ?? []);
         } catch (Exception $e) {
@@ -86,7 +89,8 @@ class JobsAhorro extends Model
         if ($datos["fecha"]) $parametros[0]["fecha"] = $datos["fecha"];
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $db->insertaMultiple($qrys, $parametros);
             return self::Responde(true, "Devengo aplicado correctamente");
         } catch (Exception $e) {
@@ -118,7 +122,8 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $res = $db->queryAll($qry);
             return self::Responde(true, "Inversiones obtenidas correctamente", ($res ?? []));
         } catch (Exception $e) {
@@ -188,7 +193,8 @@ class JobsAhorro extends Model
         ];
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $db->insertaMultiple($qrys, $parametros);
             return self::Responde(true, "Inversión liquidada correctamente");
         } catch (Exception $e) {
@@ -225,7 +231,8 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $res = $db->queryAll($qry);
             return self::Responde(true, "Solicitudes de retiro obtenidas correctamente", $res ?? []);
         } catch (Exception $e) {
@@ -316,7 +323,8 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $res = $db->queryAll($qry);
             return self::Responde(true, "Sucursales sin arqueo obtenidas correctamente", $res ?? []);
         } catch (Exception $e) {
@@ -364,7 +372,8 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $res = $db->queryAll($qry);
             return self::Responde(true, "Sucursales obtenidas correctamente", $res ?? []);
         } catch (Exception $e) {
@@ -428,7 +437,8 @@ class JobsAhorro extends Model
         $parametros[1]["fecha"] = date("N") == 5 ? date("d/m/Y H:i:s", strtotime("+3 days 8am")) : date("d/m/Y H:i:s", strtotime("tomorrow 8am"));
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $db->insertaMultiple($qrys, $parametros);
             return self::Responde(true, "Saldos capturados correctamente");
         } catch (Exception $e) {
@@ -559,7 +569,8 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $db = new Database();
+            $config = App::getConfig();
+            $db = new Database($config['SERVER-MCM']);
             $res = $db->queryAll($qry);
             return self::Responde(true, "Créditos activos obtenidos correctamente", $res ?? []);
         } catch (Exception $e) {

@@ -6,8 +6,6 @@ defined("APPPATH") or die("Access denied");
 
 use \Core\Database;
 use \App\models\LogTransaccionesAhorro;
-use Exception;
-use DateTime;
 
 class CajaAhorro
 {
@@ -40,7 +38,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($qry, ['cajera' => $cajera]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -69,7 +67,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -94,7 +92,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -120,7 +118,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -141,7 +139,7 @@ class CajaAhorro
             $res = $mysqli->queryOne($query);
             if ($res) return $res['MONTO_MINIMO'];
             return 0;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -183,7 +181,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -206,7 +204,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qry);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -229,7 +227,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qry);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -252,7 +250,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qry);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -274,7 +272,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($query);
             if ($res) return self::Responde(true, "Consulta realizada correctamente.", $res);
             return self::Responde(false, "No se encontraron beneficiarios para el contrato {$contrato}.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los beneficiarios del contrato {$contrato}.", null, $e->getMessage());
         }
     }
@@ -315,7 +313,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryAll($query_busca_cliente);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return "";
         }
     }
@@ -375,7 +373,7 @@ class CajaAhorro
             if ($res['NO_CONTRATOS'] >= 1) return self::Responde(false, "El cliente {$datos['cliente']} ya cuenta con un contrato de ahorro.", $res);
             if ($res) return self::Responde(true, "Consulta realizada correctamente.", $res);
             return self::Responde(false, "No se encontraron datos para el cliente {$datos['cliente']}.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los datos del cliente.", null, $e->getMessage());
         }
     }
@@ -423,7 +421,7 @@ class CajaAhorro
             if ($res['NO_CONTRATOS'] == 0) return self::Responde(false, "El cliente {$datos['cliente']} no cuenta con un contrato de ahorro.", $res);
             if ($res['NO_CONTRATOS'] >= 1 && $res['CONTRATO_COMPLETO'] == 0) return self::Responde(false, "El cliente {$datos['cliente']} no ha concluido el proceso de apertura de su cuenta de ahorro.", $res);
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los datos del cliente.", null, $e->getMessage());
         }
     }
@@ -469,7 +467,7 @@ class CajaAhorro
                 (:contrato, :nombre, :parentesco, 'A', SYSDATE, :porcentaje)
             sql;
 
-            $fecha = DateTime::createFromFormat('Y-m-d', $datos['fecha']);
+            $fecha = \DateTime::createFromFormat('Y-m-d', $datos['fecha']);
             $fecha = $fecha !== false && $fecha->format('Y-m-d') === $datos['fecha'] ? $fecha->format('d-m-Y') : $datos['fecha'];
 
             $datosInsert = [
@@ -527,10 +525,10 @@ class CajaAhorro
                     return self::Responde(true, "Contrato de ahorro registrado correctamente.", ['contrato' => $noContrato]);
                 }
                 return self::Responde(false, "Ocurrió un error al registrar el contrato de ahorro.");
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return self::Responde(false, "Ocurrió un error al registrar el contrato de ahorro.", null, $e->getMessage());
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al validar si el cliente ya cuenta con un contrato de ahorro.", null, $e->getMessage());
         }
     }
@@ -594,7 +592,7 @@ class CajaAhorro
                 return self::Responde(true, "Pago de apertura registrado correctamente.", ['ticket' => $ticket['CODIGO']]);
             }
             return self::Responde(false, "Ocurrió un error al registrar el pago de apertura.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar el pago de apertura.", null, $e->getMessage());
         }
     }
@@ -648,7 +646,7 @@ class CajaAhorro
                 return self::Responde(true, "El " . $tipoMov . " fue registrado correctamente.", ['ticket' => $ticket['CODIGO']]);
             }
             return self::Responde(false, "Ocurrió un error al registrar el " . $tipoMov . ".");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar el " . $tipoMov  . ".", null, $e->getMessage());
         }
     }
@@ -817,7 +815,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($queryTicket);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1055,7 +1053,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1130,7 +1128,7 @@ class CajaAhorro
             if ($res['NO_CONTRATOS'] == 0) return self::Responde(false, "El cliente {$datos['cliente']} no cuenta con un contrato de ahorro.", $res);
             if ($res['NO_CONTRATOS'] >= 1 && $res['CONTRATO_COMPLETO'] == 0) return self::Responde(false, "El cliente {$datos['cliente']} no ha concluido el proceso de apertura de su cuenta de ahorro.", $res);
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los datos del cliente.", null, $e->getMessage());
         }
     }
@@ -1173,7 +1171,7 @@ class CajaAhorro
                 (:cliente, :contrato, :nombre1, :nombre2, :apellido1, :apellido2, :fecha_nacimiento, :sexo, :curp, :pais, :entidad, SYSDATE, SYSDATE, 'A', :sucursal, :ejecutivo, :tasa)
             sql;
 
-            $fecha = DateTime::createFromFormat('Y-m-d', $datos['fecha_nac']);
+            $fecha = \DateTime::createFromFormat('Y-m-d', $datos['fecha_nac']);
             $fecha = $fecha !== false && $fecha->format('Y-m-d') === $datos['fecha_nac'] ? $fecha->format('d-m-Y') : $datos['fecha_nac'];
             $sexo = $datos['sexo'] === true || $datos['sexo'] === 'true';
 
@@ -1214,10 +1212,10 @@ class CajaAhorro
                 LogTransaccionesAhorro::LogTransacciones($inserts, $parametros, $_SESSION['cdgco_ahorro'], $_SESSION['usuario'], $noContrato, "Registro de nueva cuenta de ahorro Peque");
                 if ($res) return self::Responde(true, "Contrato de ahorro registrado correctamente.", ['contrato' => $noContrato]);
                 return self::Responde(false, "Ocurrió un error al registrar el contrato de ahorro.");
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return self::Responde(false, "Ocurrió un error al registrar el contrato de ahorro.", null, $e->getMessage());
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al validar si el cliente ya cuenta con un contrato de ahorro.", null, $e->getMessage());
         }
     }
@@ -1285,7 +1283,7 @@ class CajaAhorro
                 return self::Responde(false, "El cliente {$datos['cliente']} no cuenta con cuentas de ahorro Peques.", $res2);
             }
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los datos del cliente.", null, $e->getMessage());
         }
     }
@@ -1340,7 +1338,7 @@ class CajaAhorro
                 return self::Responde(true, "Inversión registrada correctamente.", ['ticket' => $ticket['CODIGO'], 'codigo' => $codg['CODIGO']]);
             }
             return self::Responde(false, "Ocurrió un error al registrar la inversión.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar la inversión.", null, $e->getMessage());
         }
     }
@@ -1359,7 +1357,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1390,7 +1388,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($query);
             if (count($res) === 0) return self::Responde(false, "No se encontraron inversiones para el contrato {$datos['contrato']}.");
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar las inversiones.", null, $e->getMessage());
         }
     }
@@ -1425,7 +1423,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1454,7 +1452,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1489,7 +1487,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1509,7 +1507,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }
@@ -1575,7 +1573,7 @@ class CajaAhorro
                 return self::Responde(true, "El retiro " . $tipoMov . " fue registrado correctamente.", ['ticket' => $ticket['CODIGO']]);
             }
             return self::Responde(false, "Ocurrió un error al registrar el retiro " . $tipoMov . ".");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar el retiro " . $tipoMov  . ".", null, $e->getMessage());
         }
     }
@@ -1605,7 +1603,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryAll($qry);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -1651,7 +1649,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qry);
             if (count($res) === 0) return self::Responde(false, "No se encontraron solicitudes de retiro para el producto {$datos['producto']}.", null);
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar las solicitudes de retiro.", null, $e->getMessage());
         }
     }
@@ -1688,7 +1686,7 @@ class CajaAhorro
             $res = $mysqli->queryOne($qry);
             if (!$res) return self::Responde(false, "No se encontraron datos para el retiro solicitado.");
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los datos de la solicitud.", null, $e->getMessage());
         }
     }
@@ -1765,7 +1763,7 @@ class CajaAhorro
 
             $ticket = self::RecuperaTicket($datos['contrato']);
             return self::Responde(true, "Entrega de retiro " . $tipoRetiro . " registrada correctamente.", $ticket);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar la entrega del retiro " . $tipoRetiro . ".", null, $e->getMessage());
         }
     }
@@ -1804,7 +1802,7 @@ class CajaAhorro
                 return self::Responde(true, "Se han liberado $ " . number_format($datos['monto'], 2) . " a la cuenta del cliente por el apartado para el retiro " . ($datos['tipo'] == 1 ? "express" : "programado") . ".", ['ticket' => $ticket['CODIGO']]);
             }
             return self::Responde(false, "Ocurrió un error al registrar la devolución.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar la devolución.", null, $e->getMessage());
         }
     }
@@ -1834,7 +1832,7 @@ class CajaAhorro
             $resultado = $mysqli->queryAll($qry, $datos);
             if (count($resultado) === 0) return self::Responde(false, "No se encontraron registros para la consulta.", $qry);
             return self::Responde(true, "Consulta realizada correctamente.", $resultado);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los registros.", null, $e->getMessage());
         }
     }
@@ -1879,7 +1877,7 @@ class CajaAhorro
         try {
             $mysqli = new Database();
             return $mysqli->queryAll($qry);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -1907,7 +1905,7 @@ class CajaAhorro
             $res = $mysqli->queryOne($qryDatosGenerale);
             if (!$res) return array();
             return $res;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -1994,7 +1992,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qryMovimientos);
             if (count($res) === 0) return array();
             return $res;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2061,7 +2059,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qryMovimientos);
             if (count($res) === 0) return array();
             return $res;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2090,7 +2088,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qryCuentas);
             if (count($res) === 0) return array();
             return $res;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2162,7 +2160,7 @@ class CajaAhorro
             $res = $mysqli->queryAll($qryMovimientos);
             if (count($res) === 0) return array();
             return $res;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2187,7 +2185,7 @@ class CajaAhorro
             $res = $mysqli->queryOne($qry);
             if (!$res) return self::Responde(true, "No se encontraron retiros para el día.");
             return self::Responde(false, "Retiros del día.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al validar los retiros del día.");
         }
     }
@@ -2209,7 +2207,7 @@ sql;
             $res = $mysqli->queryOne($qry);
             if (!$res) return ['MONTO_MINIMO' => 300, 'MONTO_MAXIMO' => 10000];
             return $res;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return ['MONTO_MINIMO' => 300, 'MONTO_MAXIMO' => 10000];
         }
     }
@@ -2409,7 +2407,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2638,7 +2636,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2661,7 +2659,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2688,7 +2686,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2749,7 +2747,7 @@ sql;
             $res = $mysqli->queryAll($qry);
             if ($res) return self::Responde(true, "Consulta realizada correctamente.", $res);
             return self::Responde(false, "No se encontraron registros para la consulta.", $qry);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al consultar los registros.", null, $e->getMessage());
         }
     }
@@ -2800,7 +2798,7 @@ sql;
 
             $res = $mysqli->insertar($qry, $parametros);
             return self::Responde(true, "Arqueo registrado correctamente.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al registrar el arqueo.", null, $e->getMessage());
         }
     }
@@ -2851,7 +2849,7 @@ sql;
         try {
             $mysqli = new Database();
             return $mysqli->queryOne($qry);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return [];
         }
     }
@@ -2919,7 +2917,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -2965,7 +2963,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -3021,7 +3019,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -3087,7 +3085,7 @@ sql;
             $res = $mysqli->queryAll($query);
             if ($res) return $res;
             return array();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
     }
@@ -3113,7 +3111,7 @@ sql;
                 return self::Responde(true, "Solicitud " . $accion . " correctamente.");
             }
             return self::Responde(false, "Ocurrió un error al actualizar la solicitud.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Ocurrió un error al actualizar la solicitud.", null, $e->getMessage());
         }
     }
@@ -3135,7 +3133,7 @@ sql;
             $mysqli = new Database();
             $res = $mysqli->insertar($qry, $params);
             return self::Responde(true, "Solicitud actualizada correctamente.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Error al actualizar solicitud.", null, $e->getMessage());
         }
     }
@@ -3168,7 +3166,7 @@ sql;
             $mysqli = new Database();
             $mysqli->insertar($qry, []);
             return self::Responde(true, "Huellas registradas correctamente.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Error al registrar huella.", null, $e->getMessage());
         }
     }
@@ -3196,7 +3194,7 @@ sql;
         try {
             $mysqli = new Database();
             return $mysqli->queryAll($qry);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return [];
         }
     }
@@ -3216,7 +3214,7 @@ sql;
             $mysqli = new Database();
             $res = $mysqli->queryOne($qry);
             return self::Responde(true, "Consulta realizada correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Error al consultar huellas.", null, $e->getMessage());
         }
     }
@@ -3242,7 +3240,7 @@ sql;
             $mysqli = new Database();
             $res = $mysqli->insertar($qry, []);
             return self::Responde(true, "Huellas actualizadas correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Error al actualizar huellas.", null, $e->getMessage());
         }
     }
@@ -3260,7 +3258,7 @@ sql;
             $mysqli = new Database();
             $res = $mysqli->eliminar($qry);
             return self::Responde(true, "Huellas eliminadas correctamente.", $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return self::Responde(false, "Error al eliminar huellas.", null, $e->getMessage());
         }
     }

@@ -188,6 +188,7 @@ html;
             <li><a href="/Validaciones/RegistroTelarana/">Registro Telaraña</a></li>
             <li><a href="/Creditos/ActualizaCredito/">Actualización de Créditos</a></li>
             <li><a href="/Devengo/">Devengo Crédito</a></li>
+            <li><a href="/Creditos/cierreDiario">Cierres</a></li>
 html;
         }
         if ($this->__perfil == 'ADMIN' || $this->__perfil == 'CAMAG') {

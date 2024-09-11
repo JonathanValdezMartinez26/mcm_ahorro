@@ -925,7 +925,7 @@ sql;
 sql;
         $accion = new \stdClass();
         $accion->_sql = $query;
-        return $mysqli->update($query);
+        return $mysqli->eliminar($query);
     }
 
     public static function DeleteProcedure($cdgns, $fecha, $user, $secuencia)
