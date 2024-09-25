@@ -992,6 +992,23 @@ html;
                     configuraTabla("cierres")
                 })
             }
+
+            const descargaExcel = () => {
+                const fecha = document.getElementById('fecha').value
+                if (!fecha) return showError("Ingrese una fecha a buscar.")
+
+                const formDescarga = document.createElement("form")
+                formDescarga.action = "/Creditos/excelCierreDiario/?fecha=" + fecha
+                formDescarga.method = "POST"
+                formDescarga.target = "_blank"
+                formDescarga.style.display = "none"
+                document.body.appendChild(formDescarga)
+                formDescarga.submit()
+
+                document.body.removeChild(formDescarga)
+
+                showInfo("Generando el archivo, espere un momento...")
+            }
         </script>
         HTML;
 
@@ -1025,5 +1042,33 @@ html;
             "datos" => $tabla,
             "mensaje" => count($datos) > 0 ? "" : "No se encontraron registros."
         ]);
+    }
+
+    public function excelCierreDiario()
+    {
+        $fecha = $_GET['fecha'];
+        $estilos = \PHPSpreadsheet::GetEstilosExcel();
+
+        $columnas = [
+            \PHPSpreadsheet::ColumnaExcel('A', 'SUCURSAL', 'SUCURSAL'),
+            \PHPSpreadsheet::ColumnaExcel('B', 'NOMBRE_ASESOR', 'NOMBRE ASESOR'),
+            \PHPSpreadsheet::ColumnaExcel('C', 'CODIGO_GRUPO', 'CODIGO GRUPO', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('D', 'CODIGO_CLIENTE', 'CODIGO CLIENTE', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('E', 'CURP_CLIENTE', 'CURP CLIENTE', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('F', 'NOMBRE_COMPLETO_CLIENTE', 'NOMBRE CLIENTE'),
+            \PHPSpreadsheet::ColumnaExcel('G', 'CODIGO_AVAL', 'CODIGO AVAL', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('H', 'CURP_AVAL', 'CURP AVAL', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('I', 'NOMBRE_COMPLETO_AVAL', 'NOMBRE AVAL'),
+            \PHPSpreadsheet::ColumnaExcel('J', 'CICLO', 'CICLO', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('K', 'FECHA_INICIO', 'FECHA INICIO', $estilos['fecha']),
+            \PHPSpreadsheet::ColumnaExcel('L', 'SALDO_TOTAL', 'SALDO TOTAL', $estilos['moneda']),
+            \PHPSpreadsheet::ColumnaExcel('M', 'MORA_TOTAL', 'MORA TOTAL', $estilos['moneda']),
+            \PHPSpreadsheet::ColumnaExcel('N', 'DIAS_MORA', 'DIAS MORA', $estilos['centrado']),
+            \PHPSpreadsheet::ColumnaExcel('O', 'TIPO_CARTERA', 'TIPO CARTERA', $estilos['centrado'])
+        ];
+
+        $filas = CreditosDao::GetCierreDiario($fecha);
+
+        \PHPSpreadsheet::GeneraExcel('Situación Cartera MCM', 'Reporte', 'Situación Cartera MCM', $columnas, $filas);
     }
 }

@@ -42,9 +42,9 @@ class Controller
 
     public function GetExtraHeader($titulo, $elementos = [])
     {
-        $html = <<<html
+        $html = <<<HTML
         <title>$titulo</title>
-        html;
+        HTML;
 
         if (!empty($elementos)) {
             foreach ($elementos as $elemento) {
