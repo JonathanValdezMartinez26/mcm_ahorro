@@ -1446,7 +1446,7 @@ html;
         }
 
         foreach ($sucursales as $key => $val2) {
-            $getSucursales .= '<option value="' . $val2['ID_SUCURSAL'] . '">' . $val2['ID_SUCURSAL'] . '</option>';
+            $getSucursales .= '<option value="' . $val2['ID_SUCURSAL'] . '">' . $val2['SUCURSAL'] . '</option>';
         }
 
         if ($Inicial != '' && $Final != '') {
