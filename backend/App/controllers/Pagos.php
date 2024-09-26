@@ -28,192 +28,170 @@ class Pagos extends Controller
 
     public function index()
     {
-        $extraHeader = <<<html
-        <title>Administración de Pagos</title>
-        <link rel="shortcut icon" href="/img/logo.png">
-html;
+        $extraHeader = self::getExtraHeader('Administración de Pagos');
 
-        $extraFooter = <<<html
-      <script>
-      
-        ponerElCursorAlFinal('Credito');
-      
-        function getParameterByName(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-        }
-    
-        $(document).ready(function(){
-            $("#muestra-cupones").tablesorter();
-          var oTable = $('#muestra-cupones').DataTable({
-                "columnDefs": [{
-                    "orderable": false,
-                    "targets": 0
-                }],
-                 "order": false
-            });
-            // Remove accented character from search input as well
-            $('#muestra-cupones input[type=search]').keyup( function () {
-                var table = $('#example').DataTable();
-                table.search(
-                    jQuery.fn.DataTable.ext.type.search.html(this.value)
-                ).draw();
-            });
-            var checkAll = 0;
-            
-        });
-       function FunDelete_Pago(secuencia, fecha, usuario) {
-             credito = getParameterByName('Credito');
-             user = usuario;
-             ////////////////////////////
-             swal({
-              title: "¿Segúro que desea eliminar el registro seleccionado?",
-              text: "",
-              icon: "warning",
-              buttons: true,
-              dangerMode: true,
+        $extraFooter = <<<HTML
+        <script>
+            ponerElCursorAlFinal("Credito")
+
+            function getParameterByName(name) {
+                name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
+                var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                    results = regex.exec(location.search)
+                return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "))
+            }
+
+            $(document).ready(function () {
+                $("#muestra-cupones").tablesorter()
+                var oTable = $("#muestra-cupones").DataTable({
+                    columnDefs: [
+                        {
+                            orderable: false,
+                            targets: 0
+                        }
+                    ],
+                    order: false
+                })
+                // Remove accented character from search input as well
+                $("#muestra-cupones input[type=search]").keyup(function () {
+                    var table = $("#example").DataTable()
+                    table.search(jQuery.fn.DataTable.ext.type.search.html(this.value)).draw()
+                })
+                var checkAll = 0
             })
-            .then((willDelete) => {
-              if (willDelete) {
-                  $.ajax({
-                        type: "POST",
-                        url: "/Pagos/Delete/",
-                        data: {"cdgns" : credito, "fecha" : fecha, "secuencia": secuencia, "usuario" : user},
-                        success: function(response){
-                            if(response == '1 Proceso realizado exitosamente')
-                                {
+            function FunDelete_Pago(secuencia, fecha, usuario) {
+                credito = getParameterByName("Credito")
+                user = usuario
+                ////////////////////////////
+                swal({
+                    title: "¿Segúro que desea eliminar el registro seleccionado?",
+                    text: "",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Pagos/Delete/",
+                            data: { cdgns: credito, fecha: fecha, secuencia: secuencia, usuario: user },
+                            success: function (response) {
+                                if (response == "1 Proceso realizado exitosamente") {
                                     swal("Registro fue eliminado correctamente", {
-                                      icon: "success",
-                                    });
-                                    location.reload();
-                                    
-                                }
-                            else
-                                {
+                                        icon: "success"
+                                    })
+                                    location.reload()
+                                } else {
                                     swal(response, {
-                                      icon: "error",
-                                    });
-                                    
+                                        icon: "error"
+                                    })
                                 }
-                        }
-                    });
-                  /////////////////
-              } else {
-                swal("No se pudo eliminar el registro");
-              }
-            });
-             }
-        function enviar_add(){	
-             monto = document.getElementById("monto").value; 
-             
-            if(monto == '')
-                {
-                    if(monto == 0)
-                        {
-                             swal("Atención", "Ingrese un monto mayor a $0", "warning");
-                             document.getElementById("monto").focus();
-                             
-                        }
-                }
-            else
-                {
-                    texto = $("#ejecutivo :selected").text();
-                   
-                    $.ajax({
-                    type: 'POST',
-                    url: '/Pagos/PagosAdd/',
-                    data: $('#Add').serialize()+ "&ejec="+texto,
-                    success: function(respuesta) {
-                         if(respuesta=='1 Proceso realizado exitosamente'){
-                      
-                        document.getElementById("monto").value = "";
-                        
-                         swal("Registro guardado exitosamente", {
-                                      icon: "success",
-                                    });
-                        location.reload();
-                        }
-                        else {
-                        $('#modal_agregar_pago').modal('hide')
-                         swal(respuesta, {
-                                      icon: "error",
-                                    });
-                         
-                        }
+                            }
+                        })
+                        /////////////////
+                    } else {
+                        swal("No se pudo eliminar el registro")
                     }
-                    });
-                }
-    }
-        function enviar_edit(){	
-           
-             monto = document.getElementById("monto_e").value; 
-             
-            if(monto == '')
-                {
-                    if(monto == 0)
-                        {
-                             swal("Atención", "Ingrese un monto mayor a $0", "warning");
-                             document.getElementById("monto_e").focus();
-                        }
-                }
-            else
-                {
-                    texto = $("#ejecutivo_e :selected").text();
-                   
-                    $.ajax({
-                    type: 'POST',
-                    url: '/Pagos/PagosEdit/',
-                    data: $('#Edit').serialize()+ "&ejec_e="+texto,
-                    success: function(respuesta) {
-                         if(respuesta=='1 Proceso realizado exitosamente'){
-                      
-                        document.getElementById("monto_e").value = "";
-                        
-                         swal("Registro guardado exitosamente", {
-                                      icon: "success",
-                                    });
-                        location.reload();
-                        }
-                        else {
-                        $('#modal_editar_pago').modal('hide')
-                         swal(respuesta, {
-                                      icon: "error",
-                                    });
-                        }
+                })
+            }
+            function enviar_add() {
+                monto = document.getElementById("monto").value
+
+                if (monto == "") {
+                    if (monto == 0) {
+                        swal("Atención", "Ingrese un monto mayor a $0", "warning")
+                        document.getElementById("monto").focus()
                     }
-                    });
+                } else {
+                    texto = $("#ejecutivo :selected").text()
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Pagos/PagosAdd/",
+                        data: $("#Add").serialize() + "&ejec=" + texto,
+                        success: function (respuesta) {
+                            if (respuesta == "1 Proceso realizado exitosamente") {
+                                document.getElementById("monto").value = ""
+
+                                swal("Registro guardado exitosamente", {
+                                    icon: "success"
+                                })
+                                location.reload()
+                            } else {
+                                $("#modal_agregar_pago").modal("hide")
+                                swal(respuesta, {
+                                    icon: "error"
+                                })
+                            }
+                        }
+                    })
                 }
-    }
-        function Desactivado()
-         {
-             swal("Atención", "Usted no puede modificar este registro", "warning");
-         }
-         function InfoAdmin()
-         {
-             swal("Info", "Este registro fue capturado por una administradora en caja", "info");
-         }
-         function InfoPhone()
-         {
-             swal("Info", "Este registro fue capturado por un ejecutivo en campo y procesado por una administradora", "info");
-         }
-         
-         function BotonPago(estatus)
-         {
-            if(estatus == 'LIQUIDADO')
-                {
-                    select = $("#tipo");
-                     select.empty();
-                     select.append($("<option>", {
-                        value: 'M',
-                        text: 'MULTA'
-                      }));
+            }
+            function enviar_edit() {
+                monto = document.getElementById("monto_e").value
+
+                if (monto == "") {
+                    if (monto == 0) {
+                        swal("Atención", "Ingrese un monto mayor a $0", "warning")
+                        document.getElementById("monto_e").focus()
+                    }
+                } else {
+                    texto = $("#ejecutivo_e :selected").text()
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Pagos/PagosEdit/",
+                        data: $("#Edit").serialize() + "&ejec_e=" + texto,
+                        success: function (respuesta) {
+                            if (respuesta == "1 Proceso realizado exitosamente") {
+                                document.getElementById("monto_e").value = ""
+
+                                swal("Registro guardado exitosamente", {
+                                    icon: "success"
+                                })
+                                location.reload()
+                            } else {
+                                $("#modal_editar_pago").modal("hide")
+                                swal(respuesta, {
+                                    icon: "error"
+                                })
+                            }
+                        }
+                    })
                 }
-         }
-    
-      </script>
-html;
+            }
+            function Desactivado() {
+                swal("Atención", "Usted no puede modificar este registro", "warning")
+            }
+            function InfoAdmin() {
+                swal("Info", "Este registro fue capturado por una administradora en caja", "info")
+            }
+            function InfoPhone() {
+                swal(
+                    "Info",
+                    "Este registro fue capturado por un ejecutivo en campo y procesado por una administradora",
+                    "info"
+                )
+            }
+
+            function BotonPago(estatus) {
+                if (estatus == "LIQUIDADO") {
+                    select = $("#tipo")
+                    select.empty()
+                    select.append(
+                        $("<option>", {
+                            value: "M",
+                            text: "MULTA GESTORES"
+                        }),
+                        $("<option>", {
+                            value: "Y",
+                            text: "PAGO EXCEDENTE"
+                        })
+                    )
+                }
+            }
+        </script>
+        HTML;
 
 
         $credito = $_GET['Credito'];
