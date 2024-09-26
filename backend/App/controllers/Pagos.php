@@ -181,6 +181,10 @@ class Pagos extends Controller
                     select.append(
                         $("<option>", {
                             value: "M",
+                            text: "MULTA"
+                        }),
+                        $("<option>", {
+                            value: "Z",
                             text: "MULTA GESTORES"
                         }),
                         $("<option>", {
@@ -1802,6 +1806,10 @@ html;
                     select.append(
                         $("<option>", {
                             value: "M",
+                            text: "MULTA"
+                        }),
+                        $("<option>", {
+                            value: "Z",
                             text: "MULTA GESTORES"
                         }),
                         $("<option>", {
