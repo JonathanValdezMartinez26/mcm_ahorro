@@ -28,7 +28,7 @@ class JobsCredito extends Model
                 AND PRC.NOCHEQUE IS NULL
         SQL;
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->queryAll($qry);
     }
 
@@ -41,7 +41,7 @@ class JobsCredito extends Model
             AND CDGCO = :cdgco
         SQL;
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->queryOne($qry, ["cdgco" => $cdgco]);
     }
 
@@ -51,7 +51,7 @@ class JobsCredito extends Model
             SELECT FNSIGCHEQUE('EMPFIN', :chequera) CHQSIG FROM DUAL
         SQL;
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->queryOne($qry, ["chequera" => $chequera]);
     }
 
@@ -83,7 +83,7 @@ class JobsCredito extends Model
             "ciclo" => $datos["ciclo"],
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->insertar($qry, $parametros);
     }
 
@@ -112,7 +112,7 @@ class JobsCredito extends Model
             "ciclo" => $datos["ciclo"]
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->insertar($qry, $parametros);
     }
 
@@ -137,7 +137,7 @@ class JobsCredito extends Model
             "prmINICIO" => $datos["prmINICIO"]
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->queryOne($qry, $parametros);
     }
 
@@ -162,7 +162,7 @@ class JobsCredito extends Model
             "prmINICIO" => $datos["prmINICIO"]
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->queryOne($qry, $parametros);
     }
 
@@ -186,7 +186,7 @@ class JobsCredito extends Model
             "prmINICIO" => $datos["prmINICIO"]
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->queryOne($qry, $parametros);
     }
 
@@ -249,7 +249,7 @@ class JobsCredito extends Model
             "vINTERES" => $datos["vINTERES"]
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->insertCheques($qry, $parametros);
     }
 
@@ -307,7 +307,7 @@ class JobsCredito extends Model
             "vINTERES" => $datos["vINTERES"],
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->insertCheques($qry, $parametros);
     }
 
@@ -350,7 +350,7 @@ class JobsCredito extends Model
             "vINTERES" => $datos["vINTERES"]
         ];
 
-        $db = new Database();
+        $db = new Database("SERVIDOR-MCM");
         return $db->insertCheques($qry, $parametros);
     }
 }

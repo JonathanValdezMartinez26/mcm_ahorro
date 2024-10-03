@@ -1,1 +1,1 @@
-C:\xampp\php\php.exe -f \controllers\JobsCredito.php
+C:\xampp\php\php.exe -f C:\xampp\htdocs\mcm_ahorro\backend\Jobs\controllers\JobsCredito.php

@@ -254,7 +254,7 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $mysqli = new Database();
+            $mysqli = new Database("SERVIDOR-MCM");
             $res = $mysqli->queryOne($qry);
             if (!$res) return self::Responde(true, "Solicitud cancelada correctamente.");
             return self::Responde(false, "Ocurrió un error al cancelar la solicitud.");
@@ -285,7 +285,7 @@ class JobsAhorro extends Model
         ];
 
         try {
-            $mysqli = new Database();
+            $mysqli = new Database("SERVIDOR-MCM");
             $res = $mysqli->insertaMultiple($query, $datosInsert);
             if ($res) {
                 $ticket = self::RecuperaTicket($datos['contrato']);
@@ -352,7 +352,7 @@ class JobsAhorro extends Model
                 'sucursal' => $datos['sucursal']
             ];
 
-            $mysqli = new Database();
+            $mysqli = new Database("SERVIDOR-MCM");
             $res = $mysqli->insertar($qry, $parametros);
             return self::Responde(true, "Arqueo registrado correctamente.");
         } catch (Exception $e) {
@@ -530,7 +530,7 @@ class JobsAhorro extends Model
         SQL;
 
         try {
-            $mysqli = new Database();
+            $mysqli = new Database("SERVIDOR-MCM");
             return $mysqli->queryOne($queryTicket);
         } catch (Exception $e) {
             return 0;
